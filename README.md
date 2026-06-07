@@ -65,7 +65,7 @@ Siga o passo a passo abaixo para instalar a extensão manualmente em seu navegad
 Clique no ícone da extensão no canto superior direito do seu navegador para abrir o painel privado:
 
 <div align="center">
-  <img src="popup_config.png" alt="Painel Administrativo Privado" width="300">
+  <img src="painel-administrativo-popup.png" alt="Painel Administrativo Privado" width="300">
 </div>
 
 * **Recursos Ativos**: Você pode ligar/desligar o Mapeamento de Supervisor, o botão de "Lançar Recicla", ou definir se a Consulta de Retirada deve ser manual ou automática.
@@ -76,7 +76,7 @@ Clique no ícone da extensão no canto superior direito do seu navegador para ab
 Acesse a página do SGI Boticário permitida. Um painel flutuante aparecerá no canto inferior direito.
 
 <div align="center">
-  <img src="painel_config.png" alt="Configurações In-Page" width="300">
+  <img src="painel-interface-inpage.png" alt="Configurações In-Page" width="300">
 </div>
 
 * Clique no **ícone de engrenagem (⚙️)** para abrir as configurações.
