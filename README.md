@@ -1,75 +1,93 @@
-# SGI Boticário - Extensão de Alocação, Recicla e Supervisor (Manifest V3)
+<div align="center">
+  <img src="icon.png" alt="SGI Boticário Extension Logo" width="128">
 
-Esta é a versão oficial da sua ferramenta para o SGI Boticário, agora empacotada como uma **Extensão de Navegador Nativa (Chrome e Edge)**!
+  # SGI Boticário - Extensão de Alocação, Recicla e Supervisor
 
-Desenvolvida com a tecnologia moderna **Manifest V3**, esta extensão oferece maior confiabilidade nas integrações, armazenamento de dados 100% seguro (que não some se você limpar os dados do site) e uma interface **Premium com Glassmorphism** (efeito de vidro fosco, cantos arredondados e transições suaves).
+  **Uma extensão nativa (Manifest V3) para otimização, automação e gestão inteligente de revendedores e supervisores no SGI Boticário.**
+</div>
 
 ---
 
-## 🚀 Como Instalar a Extensão no seu Navegador
+## 📖 Sobre o Projeto
 
-Siga estes passos simples para carregar a extensão no Google Chrome ou no Microsoft Edge:
+Esta extensão foi desenvolvida para aprimorar a experiência no sistema SGI Boticário, trazendo recursos de automação de processos, alertas visuais inteligentes e integração nativa com o WhatsApp e Google Sheets. Construída sob a arquitetura moderna do **Manifest V3**, a ferramenta garante maior segurança, estabilidade e armazenamento persistente de dados no navegador.
+
+A interface foi projetada com design **Premium** utilizando **Glassmorphism** (efeito de vidro fosco, sombras suaves e cantos arredondados), proporcionando um visual moderno e não intrusivo.
+
+---
+
+## ✨ Principais Funcionalidades
+
+- **Mapeamento de Supervisores**: Identifica automaticamente a qual supervisor um revendedor pertence e exibe notificações toast (estilo Windows 11) diretamente na tela.
+- **Integração Rápida com WhatsApp**: Botões de ação rápida nas notificações para enviar mensagens formatadas e automáticas diretamente para os supervisores via WhatsApp Web.
+- **Consulta Inteligente de Retirada**: Verifica dados diretamente de uma planilha do Google Sheets vinculada. O botão de consulta muda de cor dinamicamente (Verde para sem pendências, Vermelho e alerta visual quando há produtos para retirar).
+- **Lançamento de Recicla**: Facilita o preenchimento e envio de dados de reciclagem diretamente do SGI para a sua base de dados (Google Sheets) com um único clique.
+- **Bypass de CORS Integrado**: Utiliza *Service Workers* em background para garantir que as requisições para o Google Sheets nunca sejam bloqueadas pelo navegador.
+- **Armazenamento Seguro**: Configurações sensíveis (URLs de planilhas, mapeamentos, usuários) são armazenadas localmente usando a API `chrome.storage.local`. Dados não são perdidos caso o usuário limpe o cache ou os cookies do site.
+
+---
+
+## 🛠️ Como Funciona?
+
+A extensão é dividida em três partes principais:
+
+1. **Painel Administrativo Privado (Popup do Navegador)**: Onde você configura as conexões sistêmicas, como as URLs dos webhooks do Google Sheets e ativa/desativa os recursos principais da extensão de forma segura.
+2. **Background Service Worker**: Roda de forma invisível no navegador para interceptar eventos, fazer chamadas em APIs externas (planilhas) ignorando bloqueios de CORS e gerenciar o fluxo de dados entre abas.
+3. **Painel In-Page (Frontend)**: A interface flutuante (estilo "Glassmorphism") injetada dentro das páginas permitidas do SGI Boticário. É por ele que o usuário interage, mapeia supervisores e faz os lançamentos operacionais.
+
+---
+
+## 🚀 Como Instalar
+
+Siga o passo a passo abaixo para instalar a extensão manualmente em seu navegador:
 
 ### No Google Chrome:
-1. Abra o Chrome e acesse o endereço: `chrome://extensions/`
-2. No canto superior direito, ative a chave **"Modo do desenvolvedor"**.
-3. No canto superior esquerdo, clique no botão **"Carregar sem compactação"** (ou "Load unpacked").
-4. Selecione a pasta onde os arquivos desta extensão estão salvos:
-   `c:\Users\Andelison Colares\Documents\Extenção`
-5. Pronto! A extensão aparecerá na lista e já estará ativa.
+1. Faça o download ou clone este repositório para o seu computador.
+2. Abra o Chrome e acesse na barra de endereços: `chrome://extensions/`
+3. No canto superior direito, ative a chave **"Modo do desenvolvedor"**.
+4. No canto superior esquerdo, clique no botão **"Carregar sem compactação"** (ou "Load unpacked").
+5. Selecione a pasta raiz da extensão (onde encontra-se o arquivo `manifest.json`).
+6. A extensão aparecerá na sua lista e já estará pronta para uso! Fixe-a na barra de ferramentas para acesso rápido.
 
 ### No Microsoft Edge:
-1. Abra o Edge e acesse o endereço: `edge://extensions/`
-2. No menu lateral esquerdo, ative a chave **"Modo do desenvolvedor"** (Developer mode).
-3. Clique no botão **"Carregar descompactada"** (Load unpacked) que aparecerá no topo da tela.
-4. Selecione a pasta da extensão:
-   `c:\Users\Andelison Colares\Documents\Extenção`
-5. Pronto!
+1. Faça o download ou clone este repositório.
+2. Abra o Edge e acesse: `edge://extensions/`
+3. No menu lateral esquerdo, ative a chave **"Modo do desenvolvedor"**.
+4. Clique no botão **"Carregar descompactada"** no topo da tela.
+5. Selecione a pasta da extensão.
+6. Pronto!
 
 ---
 
-## 🔒 Painel Administrativo Privado (Configurações Ocultas)
+## ⚙️ Como Utilizar e Configurar
 
-Para garantir segurança máxima, total privacidade e controle operacional sobre as automações, todas as configurações sensíveis da extensão foram **removidas do frontend do site** e movidas para o **Painel Administrativo Privado da Extensão** (acessado clicando no ícone do Boticário na barra de ferramentas do seu navegador, no canto superior direito).
+### 1. Configurações de Integração (Popup)
+Clique no ícone da extensão no canto superior direito do seu navegador para abrir o painel privado:
+* **Recursos Ativos**: Você pode ligar/desligar o Mapeamento de Supervisor, o botão de "Lançar Recicla", ou definir se a Consulta de Retirada deve ser manual ou automática.
+* **Integração Google Sheets**: Insira a URL do seu App Script (Lançamento de Recicla) e a URL do Script de Consulta (Checagem de Retirada). Clique em "Salvar Planilhas".
+* **URLs de Ativação**: A extensão, por padrão, é injetada nas páginas do SGI (`/Paginas/GestaoRede/`). Aqui você pode adicionar outros caminhos de teste caso necessário.
 
-### O que você configura no Popup Privado:
+### 2. Configurações da Interface (In-Page SGI)
+Acesse a página do SGI Boticário permitida. Um painel flutuante aparecerá no canto inferior direito.
+* Clique no **ícone de engrenagem (⚙️)** para abrir as configurações.
+* **Mapeamento de Supervisores**: Insira o nome do Setor/Equipe e o nome do Supervisor responsável. Isso habilitará os alertas ao acessar os dados de um revendedor.
+* **Cadastro de Usuários**: Adicione o nome dos colaboradores que utilizarão a ferramenta para assinar os lançamentos na planilha.
+* Você também pode ajustar o zoom do painel para melhor adaptação visual.
 
-1. **🔧 Recursos Ativos (Ativar/Desativar Funções)**:
-   - **Mapeamento de Supervisor**: Ativa ou desativa completamente o display do supervisor e as notificações Toast estilo Windows na tela.
-   - **Consulta Automática de Retirada**: Se ativado, a consulta ocorre de forma automática sempre que você mudar de revendedor na tela. Se desativado, o painel economiza requisições da sua planilha, e você poderá fazer a consulta de retirada clicando manualmente no botão a hora que quiser!
-   - **Lançamento de Recicla (Botão)**: Mostra ou oculta o botão de "Lançar Recicla" no painel.
-   - *Nota: As configurações são salvas e aplicadas instantaneamente! Basta recarregar a página da web para ver o efeito.*
-
-2. **📊 Integração Google Sheets**:
-   - Insira a **URL Lançamento Recicla** (seu Apps Script de gravação).
-   - Insira a **URL Consulta Retirada** (seu Apps Script de checagem).
-   - Clique em **"Salvar Planilhas"**.
-
-3. **🌐 URLs de Ativação (Onde ela deve aparecer)**:
-   - Por padrão, a extensão só se ativa em páginas que contêm o caminho: `/Paginas/GestaoRede/`.
-   - Você pode digitar qualquer outro caminho de URL de teste (como `google.com` ou portais de homologação) e clicar em **"Adicionar"**.
-   - A extensão rodará de forma 100% silenciosa na aba e só injetará a interface e os monitores se a URL atual corresponder a algum dos caminhos cadastrados por você no popup.
+### 3. Operação no Dia a Dia
+* Ao abrir o cadastro de um revendedor, a extensão lerá automaticamente os dados da tela.
+* Se configurado, a **notificação do Supervisor** aparecerá no canto da tela informando quem é o responsável por aquele revendedor, com um botão direto para iniciar a conversa no WhatsApp.
+* Use os botões do painel flutuante para **Consultar Retiradas** ou registrar uma nova **Recicla**.
 
 ---
 
-## ⚙️ Como Configurar Mapeamentos e Usuários no Painel In-Page
+## 💻 Tecnologias Utilizadas
 
-Na página autorizada (Ex: página do SGI Boticário), você verá o painel flutuante elegante no canto inferior direito.
-
-1. Clique no ícone de engrenagem (**⚙️**).
-2. **Mapeamento de Supervisores**:
-   - Cadastre a estrutura (Ex: `Setor 1`) e o respectivo supervisor.
-   - Clique em **"Adicionar Mapeamento"**.
-3. **Cadastro de Usuários**:
-   - Cadastre os nomes dos usuários que farão lançamentos no painel inferior.
-   - Selecione o usuário ativo no menu suspenso.
-4. Ajuste o **Tamanho do Painel** (zoom de 70% a 120%) se desejar e clique novamente na engrenagem (**⚙️**) para ocultar o menu.
+* **HTML5, CSS3 (Vanilla)** e **JavaScript** puro (sem dependências pesadas).
+* **Manifest V3 API**: `chrome.storage`, `chrome.runtime`, `chrome.scripting`, `chrome.action`.
+* Design Baseado em **Glassmorphism** e **Modern UI/UX**.
 
 ---
 
-## 🎨 Principais Recursos e Diferenciais
-
-* **Proteção Total contra Perda de Dados**: Usamos a API nativa `chrome.storage.local`. Seus cadastros de supervisores, usuários e URLs de planilhas ficam salvos de forma independente no navegador e nunca são limpos juntamente com os cookies do site.
-* **Bypass de CORS Integrado**: A extensão faz as consultas e os lançamentos em segundo plano através de um *Service Worker*, eliminando erros de requisições bloqueadas pelo site ou navegador.
-* **Notificação Premium Estilo Windows 11**: O alerta do supervisor foi desenhado para se parecer com as notificações nativas do sistema, com direito a efeitos de foco e botão direto para enviar a mensagem formatada no WhatsApp.
-* **Botão "Consultar Retirada" Inteligente**: Muda de cor dinamicamente (Verde elegante se estiver sem retirada, Vermelho brilhante e aviso visual chamativo se houver retirada disponível).
+## 🔒 Privacidade e Segurança
+Todos os dados cadastrados (nomes, URLs de planilhas, mapeamentos) permanecem armazenados **exclusivamente no navegador do usuário local (Local Storage da Extensão)** e nunca são enviados para servidores de terceiros ou monitorados. Apenas ocorre comunicação direta entre a sua máquina e os endpoints do Google Sheets fornecidos por você.
