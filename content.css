@@ -1,0 +1,424 @@
+/* Estilo Premium para a Extensão SGI Boticário */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --boti-primary: #0a3d28;      /* Verde floresta característico do Boticário */
+  --boti-primary-light: #166e4a;
+  --boti-accent: #c5a059;       /* Dourado/Bronze sofisticado */
+  --boti-accent-hover: #b48e48;
+  --boti-bg-glass: rgba(255, 255, 255, 0.82);
+  --boti-bg-dark: #121814;
+  --boti-border: rgba(10, 61, 40, 0.12);
+  --boti-border-focus: #c5a059;
+  --boti-text-main: #2d3732;
+  --boti-text-muted: #5e6b64;
+  --boti-shadow-soft: 0 10px 30px rgba(10, 61, 40, 0.08);
+  --boti-shadow-strong: 0 20px 40px rgba(10, 61, 40, 0.16);
+  --boti-radius: 12px;
+  --boti-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+}
+
+/* Container Principal */
+#painelVD {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
+  font-family: var(--boti-font);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  transform-origin: bottom right;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Caixa de Configurações - Glassmorphism Premium */
+#vd-config-box {
+  background: var(--boti-bg-glass);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 20px;
+  width: 350px;
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--boti-shadow-strong);
+  border-radius: var(--boti-radius);
+  margin-bottom: 8px;
+  max-height: 75vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--boti-accent) rgba(0,0,0,0.05);
+  animation: vdFadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#vd-config-box::-webkit-scrollbar {
+  width: 6px;
+}
+#vd-config-box::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
+}
+#vd-config-box::-webkit-scrollbar-thumb {
+  background: var(--boti-accent);
+  border-radius: 10px;
+}
+
+#vd-config-box label {
+  color: var(--boti-primary);
+  font-size: 11px;
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+/* Inputs, Selects e Fields */
+#vd-config-box select, 
+#vd-config-box input[type=text] {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(10, 61, 40, 0.15);
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--boti-text-main);
+  font-size: 13px;
+  font-family: var(--boti-font);
+  box-sizing: border-box;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+#vd-config-box select:focus, 
+#vd-config-box input:focus {
+  border-color: var(--boti-accent);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.15);
+}
+
+.vd-row {
+  display: flex;
+  gap: 8px;
+}
+.vd-row input {
+  flex: 1;
+}
+.vd-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Botões do Menu de Configuração */
+.btn-salvar-config {
+  padding: 0 16px;
+  background: var(--boti-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--boti-font);
+  letter-spacing: 0.5px;
+  transition: all 0.25s ease;
+  height: 40px;
+  text-transform: uppercase;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(10, 61, 40, 0.15);
+}
+
+.btn-salvar-config:hover {
+  background: var(--boti-primary-light);
+  transform: translateY(-1px);
+}
+
+.btn-salvar-config:active {
+  transform: translateY(0);
+}
+
+#vd-hr {
+  border: none;
+  border-top: 1px solid rgba(10, 61, 40, 0.08);
+  margin: 6px 0;
+}
+
+#vd-status {
+  font-size: 12px;
+  color: var(--boti-primary);
+  text-align: center;
+  min-height: 16px;
+  margin-top: 4px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+/* Listas de Gerenciamento Estilizadas */
+.vd-lista-scroll {
+  max-height: 120px;
+  overflow-y: auto;
+  border: 1px solid rgba(10, 61, 40, 0.08);
+  border-radius: 8px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.vd-item-lista {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid rgba(10, 61, 40, 0.05);
+  font-size: 12px;
+  color: var(--boti-text-main);
+  transition: background 0.2s;
+  border-radius: 4px;
+}
+
+.vd-item-lista:hover {
+  background: rgba(197, 160, 89, 0.05);
+}
+
+.vd-item-lista:last-child {
+  border-bottom: none;
+}
+
+.vd-btn-del {
+  background: rgba(239, 68, 68, 0.08);
+  border: none;
+  color: var(--danger-color);
+  cursor: pointer;
+  font-size: 12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.vd-btn-del:hover {
+  background: var(--danger-color);
+  color: #ffffff;
+}
+
+/* Área de botões principais */
+#botoes-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  width: 100%;
+}
+.linha-boti {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+/* Display do Supervisor Premium */
+#vd-sup-display {
+  background: var(--boti-bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 12px;
+  border-radius: var(--boti-radius);
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--boti-text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: var(--boti-shadow-soft);
+  display: none;
+  animation: vdFadeInUp 0.3s ease;
+}
+
+#vd-sup-nome-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--boti-primary);
+  display: block;
+  margin-top: 6px;
+  word-break: break-word;
+}
+
+/* Engrenagem Dourada Animada */
+#vd-gear {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--boti-bg-glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--boti-primary);
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--boti-shadow-soft);
+  transition: all 0.25s ease;
+}
+
+#vd-gear:hover {
+  background: #ffffff;
+  border-color: var(--boti-accent);
+  color: var(--boti-accent);
+  transform: rotate(45deg);
+}
+
+/* Botões do SGI Premium */
+.btn-sgi {
+  background: var(--boti-bg-glass);
+  backdrop-filter: blur(10px);
+  border-radius: var(--boti-radius);
+  padding: 12px 24px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--boti-font);
+  letter-spacing: 0.6px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  text-transform: uppercase;
+  box-shadow: var(--boti-shadow-soft);
+}
+
+.btn-sgi:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--boti-shadow-strong);
+}
+
+.btn-sgi:active {
+  transform: translateY(0);
+}
+
+/* Cores dos Botões com Gradients e Bordas Elegantes */
+#vd-enviar-pill {
+  border: 2px solid var(--boti-primary);
+  color: var(--boti-primary);
+}
+#vd-enviar-pill:hover, 
+#vd-enviar-pill.enviado {
+  background: linear-gradient(135deg, var(--boti-primary) 0%, var(--boti-primary-light) 100%);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+#btn-whatsapp {
+  border: 2px solid #25d366;
+  color: #25d366;
+}
+#btn-whatsapp:hover {
+  background: linear-gradient(135deg, #25d366 0%, #1ebd5d 100%);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+#btn-retirada {
+  border: 2px solid var(--boti-accent);
+  color: var(--boti-accent);
+}
+#btn-retirada:hover {
+  background: linear-gradient(135deg, var(--boti-accent) 0%, var(--boti-accent-hover) 100%);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+/* ========================================= */
+/* NOTIFICAÇÃO ESTILO WINDOWS 11 PREMIUM     */
+/* ========================================= */
+#vd-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: -400px;
+  width: 350px;
+  background: rgba(243, 243, 243, 0.9);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  border-radius: var(--boti-radius);
+  z-index: 10001;
+  transition: right 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: var(--boti-font);
+}
+
+#vd-toast-container.show {
+  right: 24px;
+}
+
+.vd-toast-header {
+  background: linear-gradient(135deg, var(--boti-primary) 0%, var(--boti-primary-light) 100%);
+  color: white;
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vd-toast-body {
+  padding: 18px 16px;
+  font-size: 13px;
+  color: var(--boti-text-main);
+  line-height: 1.5;
+}
+
+.vd-toast-btn {
+  margin: 0 16px 16px 16px;
+  padding: 12px;
+  background: linear-gradient(135deg, #25d366 0%, #1ebd5d 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(37, 211, 102, 0.2);
+  transition: all 0.25s ease;
+}
+
+.vd-toast-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(37, 211, 102, 0.3);
+}
+
+/* Animações CSS */
+@keyframes vdFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

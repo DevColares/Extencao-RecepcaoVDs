@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "SGI Boticário - Alocação, Recicla e Supervisor",
+  "version": "9.2",
+  "description": "Integração WhatsApp, Lançamento Planilha, Alerta Retirada, Mapeamento de Supervisor e Notificações no SGI Boticário.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "https://script.google.com/*",
+    "https://script.googleusercontent.com/*",
+    "https://*.grupogerbera.com.br/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}

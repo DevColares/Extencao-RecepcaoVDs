@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Configurações - SGI Boticário</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --boti-primary: #0a3d28;
+      --boti-primary-light: #166e4a;
+      --boti-accent: #c5a059;
+      --boti-accent-hover: #b48e48;
+      --boti-bg: #f8faf9;
+      --boti-card: #ffffff;
+      --boti-text: #2d3732;
+      --boti-text-muted: #5e6b64;
+      --boti-border: rgba(10, 61, 40, 0.08);
+      --boti-radius: 12px;
+      --danger-color: #ef4444;
+      --shadow: 0 8px 24px rgba(10, 61, 40, 0.06);
+    }
+
+    body {
+      width: 350px;
+      margin: 0;
+      padding: 16px;
+      background: var(--boti-bg);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--boti-text);
+      box-sizing: border-box;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--boti-border);
+      padding-bottom: 12px;
+    }
+
+    .header img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(10, 61, 40, 0.1);
+    }
+
+    .header-info h1 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--boti-primary);
+    }
+
+    .header-info p {
+      margin: 2px 0 0 0;
+      font-size: 11px;
+      color: var(--boti-text-muted);
+      font-weight: 500;
+    }
+
+    /* Sessão de Configurações */
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--boti-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin: 14px 0 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .section-title:first-of-type {
+      margin-top: 0;
+    }
+
+    .card {
+      background: var(--boti-card);
+      border: 1px solid var(--boti-border);
+      border-radius: var(--boti-radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--boti-text-muted);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid rgba(10, 61, 40, 0.15);
+      border-radius: 8px;
+      background: #fafafa;
+      color: var(--boti-text);
+      font-family: inherit;
+      font-size: 12px;
+      outline: none;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--boti-accent);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.12);
+    }
+
+    .btn-primary {
+      height: 38px;
+      padding: 0 16px;
+      background: var(--boti-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(10, 61, 40, 0.1);
+    }
+
+    .btn-primary:hover {
+      background: var(--boti-primary-light);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    /* Listagem de URLs */
+    .url-list {
+      max-height: 110px;
+      overflow-y: auto;
+      border: 1px solid rgba(10, 61, 40, 0.06);
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 4px;
+    }
+
+    .url-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      border-bottom: 1px solid rgba(10, 61, 40, 0.04);
+      font-size: 11px;
+      word-break: break-all;
+      color: var(--boti-text);
+    }
+
+    .url-item:last-child {
+      border-bottom: none;
+    }
+
+    .url-item:hover {
+      background: rgba(197, 160, 89, 0.05);
+    }
+
+    .btn-del {
+      background: rgba(239, 68, 68, 0.08);
+      border: none;
+      color: var(--danger-color);
+      cursor: pointer;
+      font-size: 10px;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+
+    .btn-del:hover {
+      background: var(--danger-color);
+      color: white;
+    }
+
+    .empty-state {
+      padding: 12px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--boti-text-muted);
+      line-height: 1.4;
+    }
+
+    /* Toggle switches e custom checkboxes */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 4px;
+      border-bottom: 1px solid rgba(10, 61, 40, 0.04);
+    }
+    .toggle-row:last-child {
+      border-bottom: none;
+    }
+    .toggle-row span {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--boti-text);
+    }
+
+    #status-msg {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      min-height: 15px;
+      color: var(--boti-primary);
+      transition: all 0.2s;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 10px;
+      color: var(--boti-text-muted);
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <img src="icon.png" alt="SGI Boticário Logo">
+    <div class="header-info">
+      <h1>SGI Boticário</h1>
+      <p>Painel Administrativo Privado</p>
+    </div>
+  </div>
+
+  <!-- SEÇÃO DE CONTROLE DE RECURSOS -->
+  <div class="section-title">🔧 Recursos Ativos</div>
+  <div class="card" style="display: flex; flex-direction: column; gap: 4px; padding: 10px 14px;">
+    <div class="toggle-row">
+      <span>Mapeamento de Supervisor</span>
+      <input type="checkbox" id="cfg-supervisor" checked style="width: 16px; height: 16px; accent-color: var(--boti-primary); cursor: pointer;">
+    </div>
+    <div class="toggle-row">
+      <span>Consulta Automática de Retirada</span>
+      <input type="checkbox" id="cfg-retirada" checked style="width: 16px; height: 16px; accent-color: var(--boti-primary); cursor: pointer;">
+    </div>
+    <div class="toggle-row">
+      <span>Lançamento de Recicla (Botão)</span>
+      <input type="checkbox" id="cfg-recicla" checked style="width: 16px; height: 16px; accent-color: var(--boti-primary); cursor: pointer;">
+    </div>
+    <div class="toggle-row">
+      <span>Solicitar Alocação (Botão)</span>
+      <input type="checkbox" id="cfg-alocacao" checked style="width: 16px; height: 16px; accent-color: var(--boti-primary); cursor: pointer;">
+    </div>
+  </div>
+
+  <!-- SEÇÃO DE CONFIGURAÇÃO DE PLANILHAS (GOOGLE SHEETS) -->
+  <div class="section-title">📊 Integração Google Sheets</div>
+  <div class="card">
+    <div class="form-group">
+      <label for="popup-url-recicla">URL Lançamento Recicla:</label>
+      <input type="text" id="popup-url-recicla" placeholder="Cole a URL do Apps Script do Recicla">
+    </div>
+    <div class="form-group" style="margin-bottom: 14px;">
+      <label for="popup-url-retirada">URL Consulta Retirada:</label>
+      <input type="text" id="popup-url-retirada" placeholder="Cole a URL do Apps Script da Retirada">
+    </div>
+    <button id="btn-salvar-urls" class="btn-primary" style="width: 100%;">Salvar Planilhas</button>
+  </div>
+
+  <!-- SEÇÃO DE URLS DE ATIVAÇÃO -->
+  <div class="section-title">🌐 URLs de Ativação do Painel</div>
+  <div class="card">
+    <div class="form-group">
+      <label for="new-url">Permitir exibição nas páginas que contêm:</label>
+      <div class="input-row">
+        <input type="text" id="new-url" placeholder="Ex: Paginas/GestaoRede/" style="flex: 1;">
+        <button id="btn-add-url" class="btn-primary">Adicionar</button>
+      </div>
+    </div>
+
+    <label style="font-size: 10px; font-weight: 700; color: var(--boti-text-muted); text-transform: uppercase; margin-bottom: 6px; display: block;">URLs Atualmente Ativas</label>
+    <div id="url-list-container" class="url-list">
+      <!-- Inserido dinamicamente -->
+    </div>
+  </div>
+
+  <div id="status-msg"></div>
+
+  <div class="footer">
+    SGI Boticário v9.3 • Feito com ❤️ por Andelison
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
