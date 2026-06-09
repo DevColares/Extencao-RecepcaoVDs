@@ -917,12 +917,87 @@ function inicializarExtensao() {
             return;
         }
 
-        // Tenta encontrar o campo de cupom na tela (SGI). Como o ID exato não foi informado, 
-        // procuramos por campos de texto de código promocional comuns ou deixamos um aviso caso não ache
-        let campoAlvo = document.activeElement; // Se o usuário clicou no campo antes de clicar no botão
-        
-        // Exemplo genérico de tentar inserir no elemento atualmente focado ou buscar um por ID se conhecido
-        // Pode ser substituído futuramente pelo ID exato fornecido pelo usuário.
+        // Inserir o cupom no campo do SGI informado
+        const campoCupom = document.getElementsByName("ctl00$content$txtCupomDesconto$Tb1")[0] || 
+                           document.getElementById("ctl00$content$txtCupomDesconto$Tb1") ||
+                           document.getElementById("ctl00_content_txtCupomDesconto_Tb1") ||
+                           document.querySelector("input[name$='txtCupomDesconto$Tb1']") ||
+                           document.querySelector("input[id$='txtCupomDesconto_Tb1']");
+
+        if (campoCupom) {
+            let nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+            if (nativeInputValueSetter) {
+                nativeInputValueSetter.call(campoCupom, configCupomCaixa);
+            } else {
+                campoCupom.value = configCupomCaixa;
+            }
+            campoCupom.dispatchEvent(new Event('input', { bubbles: true }));
+            campoCupom.dispatchEvent(new Event('change', { bubbles: true }));
+
+            // Clica no botão para adicionar o cupom
+            setTimeout(() => {
+                const btnReal = document.querySelector("[id$='content_lbtAdicionarCupomDesconto']") || 
+                                document.getElementById("content_lbtAdicionarCupomDesconto") ||
+                                document.getElementById("I3");
+                
+                if (btnReal) {
+                    const href = btnReal.getAttribute("href");
+                    
+                    // Se for um link javascript:, NÃO PODEMOS CLICAR pois o CSP bloqueia.
+                    if (href && href.trim().startsWith("javascript:")) {
+                        let eventTarget = "";
+                        
+                        // Tenta extrair o target do __doPostBack('Alvo'
+                        const matchDPB = href.match(/__doPostBack\s*\(\s*'([^']+)'/);
+                        if (matchDPB) {
+                            eventTarget = matchDPB[1];
+                        } else {
+                            // Tenta extrair do WebForm_PostBackOptions("Alvo"
+                            const matchOptions = href.match(/WebForm_PostBackOptions\s*\(\s*"([^"]+)"/);
+                            if (matchOptions) {
+                                eventTarget = matchOptions[1];
+                            } else {
+                                // Tenta deduzir o alvo pelo ID (padrão ASP.NET)
+                                eventTarget = btnReal.id.replace(/_/g, "$");
+                            }
+                        }
+
+                        const form = document.forms[0];
+                        if (form) {
+                            let targetInput = document.getElementById("__EVENTTARGET");
+                            if (!targetInput) {
+                                targetInput = document.createElement("input");
+                                targetInput.type = "hidden";
+                                targetInput.name = "__EVENTTARGET";
+                                targetInput.id = "__EVENTTARGET";
+                                form.appendChild(targetInput);
+                            }
+                            targetInput.value = eventTarget;
+
+                            let argInput = document.getElementById("__EVENTARGUMENT");
+                            if (!argInput) {
+                                argInput = document.createElement("input");
+                                argInput.type = "hidden";
+                                argInput.name = "__EVENTARGUMENT";
+                                argInput.id = "__EVENTARGUMENT";
+                                form.appendChild(argInput);
+                            }
+                            argInput.value = "";
+
+                            form.submit();
+                        }
+                    } else {
+                        // Se for um botão normal (não tem javascript: no href), pode clicar
+                        btnReal.click();
+                    }
+                } else {
+                    console.warn("Botão de adicionar cupom não encontrado na tela.");
+                }
+            }, 500);
+        } else {
+            vdStatus("⚠️ Campo de cupom não encontrado na tela!", "#ef4444");
+            console.warn("Campo de cupom ctl00$content$txtCupomDesconto$Tb1 não encontrado.");
+        }
         
         const badgeBtn = document.getElementById("vd-btn-lancar-caixa");
         const originalText = badgeBtn.innerText;
