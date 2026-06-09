@@ -256,38 +256,76 @@
     </div>
   </div>
 
-  <!-- SEÇÃO DE CONTROLE DE RECURSOS -->
-  <div class="section-title">🔧 Recursos Ativos</div>
-  <div class="card" style="display: flex; flex-direction: column; gap: 4px; padding: 10px 14px;">
-    <div class="toggle-row">
-      <span>Mapeamento de Supervisor</span>
-      <input type="checkbox" id="cfg-supervisor" checked style="width: 16px; height: 16px; accent-color: var(--boti-primary); cursor: pointer;">
+  <!-- SEÇÃO DE CONTROLE DE MODO -->
+  <div class="section-title">🚀 Modo de Operação</div>
+  <div class="card" style="display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 16px 14px;">
+    
+    <div class="mode-switch-container" style="display: flex; background: #e2e8f0; border-radius: 8px; width: 100%; position: relative; padding: 4px; box-sizing: border-box;">
+      <div id="mode-slider" style="position: absolute; top: 4px; left: 4px; bottom: 4px; width: calc(50% - 4px); background: #ffffff; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.3s ease;"></div>
+      
+      <button id="btn-mode-recepcao" style="flex: 1; z-index: 1; background: transparent; border: none; padding: 8px 0; font-family: inherit; font-size: 12px; font-weight: 700; color: var(--boti-primary); cursor: pointer; transition: color 0.3s ease;">Recepção</button>
+      <button id="btn-mode-caixa" style="flex: 1; z-index: 1; background: transparent; border: none; padding: 8px 0; font-family: inherit; font-size: 12px; font-weight: 600; color: var(--boti-text-muted); cursor: pointer; transition: color 0.3s ease;">Caixa</button>
     </div>
-    <div class="toggle-row">
-      <span>Consulta Automática de Retirada</span>
-      <input type="checkbox" id="cfg-retirada" checked style="width: 16px; height: 16px; accent-color: var(--boti-primary); cursor: pointer;">
+
+    <div id="mode-desc" style="font-size: 11px; color: var(--boti-text-muted); text-align: center; font-weight: 500;">
+      Selecione o modo desejado acima.
     </div>
-    <div class="toggle-row">
-      <span>Lançamento de Recicla (Botão)</span>
-      <input type="checkbox" id="cfg-recicla" checked style="width: 16px; height: 16px; accent-color: var(--boti-primary); cursor: pointer;">
-    </div>
-    <div class="toggle-row">
-      <span>Solicitar Alocação (Botão)</span>
-      <input type="checkbox" id="cfg-alocacao" checked style="width: 16px; height: 16px; accent-color: var(--boti-primary); cursor: pointer;">
+
+  </div>
+
+  <!-- CONFIGURAÇÕES DE RECEPÇÃO -->
+  <div id="secao-config-recepcao">
+    <div class="section-title">🔧 Recursos da Recepção</div>
+    <div class="card" style="display: flex; flex-direction: column; gap: 4px; padding: 10px 14px;">
+      <div class="toggle-row">
+        <span>Mapeamento de Supervisor</span>
+        <input type="checkbox" id="cfg-supervisor" checked style="width: 16px; height: 16px; accent-color: var(--boti-primary); cursor: pointer;">
+      </div>
+      <div class="toggle-row">
+        <span>Consulta de Retirada Automática</span>
+        <input type="checkbox" id="cfg-retirada" checked style="width: 16px; height: 16px; accent-color: var(--boti-primary); cursor: pointer;">
+      </div>
+      <div class="toggle-row">
+        <span>Botão Lançar Recicla</span>
+        <input type="checkbox" id="cfg-recicla" checked style="width: 16px; height: 16px; accent-color: var(--boti-primary); cursor: pointer;">
+      </div>
+      <div class="toggle-row">
+        <span>Botão Solicitar Alocação</span>
+        <input type="checkbox" id="cfg-alocacao" checked style="width: 16px; height: 16px; accent-color: var(--boti-primary); cursor: pointer;">
+      </div>
     </div>
   </div>
+
+  <!-- CONFIGURAÇÕES DE CAIXA -->
+  <div id="secao-config-caixa" style="display: none;">
+    <div class="section-title">📦 Recursos do Caixa</div>
+    <div class="card" style="display: flex; flex-direction: column; gap: 4px; padding: 10px 14px;">
+      <div class="toggle-row">
+        <span>Notificações de Combo</span>
+        <input type="checkbox" id="cfg-combos" checked style="width: 16px; height: 16px; accent-color: var(--boti-primary); cursor: pointer;">
+      </div>
+    </div>
+  </div>
+
 
   <!-- SEÇÃO DE CONFIGURAÇÃO DE PLANILHAS (GOOGLE SHEETS) -->
   <div class="section-title">📊 Integração Google Sheets</div>
   <div class="card">
     <div class="form-group">
-      <label for="popup-url-recicla">URL Lançamento Recicla:</label>
+      <label for="popup-url-recicla">URL Planilha Recicla:</label>
       <input type="text" id="popup-url-recicla" placeholder="Cole a URL do Apps Script do Recicla">
     </div>
-    <div class="form-group" style="margin-bottom: 14px;">
-      <label for="popup-url-retirada">URL Consulta Retirada:</label>
+    
+    <div class="form-group" id="grupo-url-retirada" style="margin-bottom: 14px;">
+      <label for="popup-url-retirada">URL Planilha Retirada:</label>
       <input type="text" id="popup-url-retirada" placeholder="Cole a URL do Apps Script da Retirada">
     </div>
+
+    <div class="form-group" id="grupo-url-combos" style="margin-bottom: 14px; display: none;">
+      <label for="popup-url-combos">URL Planilha Combos:</label>
+      <input type="text" id="popup-url-combos" placeholder="Cole a URL do Apps Script de Combos">
+    </div>
+
     <button id="btn-salvar-urls" class="btn-primary" style="width: 100%;">Salvar Planilhas</button>
   </div>
 

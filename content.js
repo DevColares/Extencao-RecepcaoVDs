@@ -66,31 +66,62 @@ function inicializarExtensao() {
         </div>
         <hr id="vd-hr">
 
-        <div>
-          <label>Recebido Por (Lançamento)</label>
-          <select id="vd-select"><option value="">-- Selecione --</option></select>
-        </div>
-        <div>
-          <label style="margin-top: 10px;">Cadastrar Usuário</label>
-          <div class="vd-row">
-            <input type="text" id="vd-novo" placeholder="Nome...">
-            <button id="vd-salvar" class="btn-salvar-config" style="width: auto;">Salvar</button>
+        <div id="vd-secao-recepcao">
+          <div>
+            <label>📋 Lançado Por (Recepção)</label>
+            <select id="vd-select"><option value="">-- Selecione --</option></select>
           </div>
-          <label style="margin-top: 10px;">Usuários Salvos</label>
-          <div id="vd-lista-usuarios" class="vd-lista-scroll"></div>
+          <div>
+            <label style="margin-top: 10px;">Cadastrar Recepção</label>
+            <div class="vd-row">
+              <input type="text" id="vd-novo" placeholder="Nome...">
+              <button id="vd-salvar" class="btn-salvar-config" style="width: auto;">Salvar</button>
+            </div>
+            <label style="margin-top: 10px;">Recepção Salvos</label>
+            <div id="vd-lista-usuarios" class="vd-lista-scroll"></div>
+          </div>
+        </div>
+        <hr id="vd-hr-caixa">
+        <div id="vd-secao-caixa">
+          <label>📦 Recebido Por (Caixa)</label>
+          <select id="vd-select-caixa"><option value="">-- Selecione --</option></select>
+          <label style="margin-top: 10px;">Cadastrar Caixa</label>
+          <div class="vd-row">
+            <input type="text" id="vd-novo-caixa" placeholder="Nome do Caixa...">
+            <button id="vd-salvar-caixa" class="btn-salvar-config" style="width: auto;">Salvar</button>
+          </div>
+          <label style="margin-top: 10px;">Caixas Salvos</label>
+          <div id="vd-lista-caixas" class="vd-lista-scroll" style="max-height: 80px;"></div>
+          
+          <label style="margin-top: 10px;">🎟️ Cupom para Lançamento</label>
+          <input type="text" id="vd-cupom-caixa" placeholder="Ex: PROMO10" style="width: 100%; box-sizing: border-box; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
         </div>
         <div id="vd-status"></div>
       </div>
 
+      <!-- BADGE DO MODO CAIXAS (MONITOR) -->
+      <div id="vd-monitor-badge" style="display:none; background:#fff; border:2px solid #1a47d4; color:#1a47d4; font-weight:bold; font-size:13px; text-transform:uppercase; padding:8px 15px; text-align:center; font-family:Arial,Helvetica,sans-serif; margin-bottom:6px; box-shadow:0 2px 4px rgba(0,0,0,.05);">⏳ MODO CAIXAS ATIVO</div>
+
       <!-- BOTÕES PRINCIPAIS -->
       <div id="botoes-container">
-        <div id="vd-sup-display">SUPERVISOR<span id="vd-sup-nome-text">-</span></div>
-        <div class="linha-boti">
-          <button id="vd-gear" title="Configurações">⚙️</button>
-          <button id="vd-enviar-pill" class="btn-sgi">Lançar Recicla</button>
+        <!-- BOTÕES DA RECEPÇÃO -->
+        <div id="botoes-recepcao">
+          <div id="vd-sup-display">SUPERVISOR<span id="vd-sup-nome-text">-</span></div>
+          <div class="linha-boti">
+            <button id="vd-gear" title="Configurações">⚙️</button>
+            <button id="vd-enviar-pill" class="btn-sgi">Lançar Recicla</button>
+          </div>
+          <button id="btn-whatsapp" class="btn-sgi">Solicitar Alocação</button>
+          <button id="btn-retirada" class="btn-sgi">Consultar Retirada</button>
         </div>
-        <button id="btn-whatsapp" class="btn-sgi">Solicitar Alocação</button>
-        <button id="btn-retirada" class="btn-sgi">Consultar Retirada</button>
+
+        <!-- BOTÕES DO CAIXA -->
+        <div id="botoes-caixa" style="display:none; flex-direction: row; gap: 6px; align-items: center; justify-content: center;">
+          <button id="vd-btn-atualizar-caixa" title="Atualizar Verificação" style="width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; border: 1px solid #1a47d4; background: #fff; color: #1a47d4; border-radius: 4px; cursor: pointer; font-size: 16px;">🔄</button>
+          <button id="vd-gear-caixa" title="Configurações do Caixa" style="width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; border: 1px solid #c5a059; background: #fff; border-radius: 4px; cursor: pointer; font-size: 16px;">⚙️</button>
+          <button id="vd-badge-boti-caixa" style="flex: 1; height: 36px; font-size: 11px; font-weight: bold; border: 2px solid #ccc; background: #fff; border-radius: 4px; color: #555; pointer-events: none;">⏳ VERIFICANDO</button>
+          <button id="vd-btn-lancar-caixa" style="height: 36px; padding: 0 10px; border: none; background: #1a47d4; color: #fff; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 4px;">➡️ LANÇAR</button>
+        </div>
       </div>
     `;
 
@@ -112,6 +143,69 @@ function inicializarExtensao() {
     document.body.appendChild(painel);
     document.body.appendChild(toastHtml);
 
+    // --- ELEMENTOS DO MODO COMBO (INJETADOS NA TELA) ---
+    const estiloCombo = document.createElement("style");
+    estiloCombo.innerHTML = `
+        #combo-status-ball {
+            position: fixed; bottom: 20px; right: 20px; width: 15px; height: 15px; 
+            border-radius: 50%; background-color: #ff9800; z-index: 30000;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3); transition: background-color 0.3s ease;
+            cursor: pointer; 
+        }
+        #combo-status-ball.carregado { background-color: #4CAF50; }
+        #combo-status-ball.erro { background-color: #f44336; }
+
+        #alerta-combo-flutuante {
+            position: fixed; top: 20px; right: 20px; width: 280px;
+            background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px;
+            color: #fff; font-family: 'Segoe UI', sans-serif;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); z-index: 20000;
+            transform: translateX(150%); transition: transform 0.3s ease-out;
+            text-align: center;
+        }
+        #alerta-combo-flutuante.show { transform: translateX(0); }
+        #alerta-combo-flutuante img { width: 120px; height: 120px; object-fit: contain; border-radius: 8px; background: #fff; margin: 10px 0; }
+        
+        .codigo-combo-box { 
+            font-size: 24px; font-weight: bold; background: rgba(0,0,0,0.6); 
+            padding: 10px; border-radius: 6px; margin: 10px 0; 
+            border: 2px dashed #FFD700; color: #FFD700; letter-spacing: 2px;
+        }
+
+        .btn-acao { 
+            padding: 12px; border-radius: 6px; font-weight: bold; 
+            cursor: pointer; border: none; margin: 4px 0; width: 100%; 
+            transition: 0.2s; font-size: 13px; text-transform: uppercase;
+        }
+        
+        #btn-fechar { background: #f44336; color: white; }
+        #btn-fechar:hover { background: #d32f2f; }
+    `;
+    document.head.appendChild(estiloCombo);
+
+    const statusBall = document.createElement('div');
+    statusBall.id = 'combo-status-ball';
+    statusBall.title = "Clique para atualizar o Banco de Combos manualmente";
+    // Oculta inicialmente, só exibe se o modo caixa + combos estiverem ativos
+    statusBall.style.display = "none";
+    document.body.appendChild(statusBall);
+
+    const flutuanteCombo = document.createElement('div');
+    flutuanteCombo.id = 'alerta-combo-flutuante';
+    flutuanteCombo.innerHTML = `
+        <h3 style="margin:0; color: #FFD700; font-size: 15px;">🎁 COMBO DISPONÍVEL</h3>
+        <img src="" id="foto-combo">
+        <div id="nome-combo" style="font-size: 13px; margin-bottom: 5px; line-height: 1.2;"></div>
+        <div style="font-size: 11px; opacity: 0.8;">CÓDIGO DO COMBO (DIGITE ABAIXO):</div>
+        <div class="codigo-combo-box" id="codigo-combo"></div>
+        <div>
+            <button type="button" id="btn-fechar" class="btn-acao">FECHAR AVISO E LANÇAR ITEM</button>
+        </div>
+    `;
+    document.body.appendChild(flutuanteCombo);
+
     // --- CONFIGURAÇÕES PADRÃO (VALORES DE BACKUP) ---
     const URL_RETIRADA_PADRAO = "https://script.google.com/a/macros/grupogerbera.com.br/s/AKfycbwZbqWfdYsMlTWbDe4qmLIWGxNGinX1i2AIxRPlfY5vdOjHAg_4jIP5OiJqKHq7851g/exec";
     const URL_RECICLA_PADRAO = "https://script.google.com/macros/s/AKfycbxBDmkbgMzdAoAmolR6daKABWZ0YhM2arzC_mcSkbPT6_RIrXdvef7phLa2U2FtE2U3/exec";
@@ -122,24 +216,44 @@ function inicializarExtensao() {
     let configUsuarios = [];
     let configUrlRecicla = "";
     let configUrlRetirada = "";
+    let configModoPrincipal = "recepcao"; // 'recepcao' ou 'caixa'
+    let configUsuariosCaixa = [];
     let configSupervisorAtivo = true;
     let configRetiradaAtivo = true;
     let configReciclaAtivo = true;
     let configAlocacaoAtivo = true;
+    let configCombosAtivo = true;
 
     let ultimoNomeConsultado = "";
+    let ultimoNomeMonitorado = "";
     let notificacaoEnviada = false; // Garante que a notificação apite só 1 vez por revendedor
 
     // --- ATRIBUINDO EVENTOS ---
     document.getElementById("vd-gear").addEventListener("click", vdToggleConfig);
+    document.getElementById("vd-gear-caixa").addEventListener("click", vdToggleConfig);
     document.getElementById("vd-salvar").addEventListener("click", vdCadastrar);
     document.getElementById("vd-salvar-sup").addEventListener("click", vdSalvarSupervisor);
+    document.getElementById("vd-salvar-caixa").addEventListener("click", vdCadastrarCaixa);
+    document.getElementById("vd-cupom-caixa").addEventListener("change", (e) => {
+        configCupomCaixa = e.target.value.trim();
+        chrome.storage.local.set({ "vd_cupom_caixa": configCupomCaixa }, () => {
+            vdStatus("Cupom salvo!", "#27ae60");
+        });
+    });
     document.getElementById("vd-enviar-pill").addEventListener("click", vdEnviar);
     document.getElementById("btn-whatsapp").addEventListener("click", abrirWhatsApp);
     document.getElementById("btn-retirada").addEventListener("click", () => verificarRetirada(false));
     document.getElementById("vd-toast-close").addEventListener("click", () => {
         document.getElementById("vd-toast-container").classList.remove("show");
     });
+    document.getElementById("vd-btn-atualizar-caixa").addEventListener("click", () => {
+        ultimoNomeMonitorado = ""; // Força re-verificação
+        const nomInput = document.getElementById("ContentPlaceHolder1_cltBuscaPessoa_nomeEntradaTexto_Tb1");
+        if (nomInput && nomInput.value.trim() !== "") {
+            verificarReciclaCaixa(nomInput.value.trim());
+        }
+    });
+    document.getElementById("vd-btn-lancar-caixa").addEventListener("click", lancarCupomCaixa);
 
     document.getElementById("vd-escala").addEventListener("change", (e) => {
         const escala = e.target.value;
@@ -159,6 +273,12 @@ function inicializarExtensao() {
             notificacaoEnviada = false; // Reseta a flag para o novo revendedor
             verificarRetirada(true);
             verificarSupervisor();
+
+            // Modo Caixas: verifica recicla para o revendedor atual
+            if (configModoPrincipal === "caixa" && nomeAtual !== ultimoNomeMonitorado) {
+                ultimoNomeMonitorado = nomeAtual;
+                verificarReciclaCaixa(nomeAtual);
+            }
         }
     }, 1000);
 
@@ -175,10 +295,15 @@ function inicializarExtensao() {
             "vd_usuarios",
             "vd_url_recicla",
             "vd_url_retirada",
+            "vd_url_combos",
+            "vd_modo_principal",
+            "vd_usuarios_caixa",
+            "vd_cupom_caixa",
             "vd_cfg_supervisor_ativo",
             "vd_cfg_retirada_ativo",
             "vd_cfg_recicla_ativo",
-            "vd_cfg_alocacao_ativo"
+            "vd_cfg_alocacao_ativo",
+            "vd_cfg_combos_ativo"
         ], (data) => {
             // Escala/Zoom
             configScale = data.vd_escala || "1";
@@ -198,50 +323,88 @@ function inicializarExtensao() {
             configUrlRecicla = data.vd_url_recicla || "";
             configUrlRetirada = data.vd_url_retirada || "";
 
-            // Toggles de Recursos (Assume true por padrão)
+            // Usuários e Cupom do Caixa
+            configUsuariosCaixa = data.vd_usuarios_caixa || [];
+            configCupomCaixa = data.vd_cupom_caixa || "";
+            document.getElementById("vd-cupom-caixa").value = configCupomCaixa;
+            carregarSelectCaixas();
+            renderCaixas();
+
+            // Modo Principal
+            configModoPrincipal = data.vd_modo_principal || "recepcao";
+
+            // Status dos Recursos Individuais
             configSupervisorAtivo = data.vd_cfg_supervisor_ativo !== false;
             configRetiradaAtivo = data.vd_cfg_retirada_ativo !== false;
             configReciclaAtivo = data.vd_cfg_recicla_ativo !== false;
             configAlocacaoAtivo = data.vd_cfg_alocacao_ativo !== false;
+            configCombosAtivo = data.vd_cfg_combos_ativo !== false;
 
-            // Aplica as visibilidades condicionais baseadas nos Toggles do popup
+            // Aplica as visibilidades condicionais baseadas no Modo
             aplicarConfiguracoesVisuais();
-
-            // Executa verificação inicial (se já houver conteúdo carregado na tela)
-            verificarSupervisor();
+            
+            // Inicializa Banco de Combos se estiver no modo caixa
+            if (configModoPrincipal === "caixa" && configCombosAtivo) {
+                carregarBancoCombos(false);
+            }
         });
     }
 
     // Oculta ou mostra dinamicamente os recursos na interface
     function aplicarConfiguracoesVisuais() {
-        // 1. Botão de Lançar Recicla (linha de botões)
-        const btnRecicla = document.getElementById("vd-enviar-pill");
-        if (btnRecicla) {
-            btnRecicla.style.display = configReciclaAtivo ? "flex" : "none";
+        const modoRecepcao = configModoPrincipal === "recepcao";
+        const modoCaixa = configModoPrincipal === "caixa";
+
+        // Containers de Botões
+        document.getElementById("botoes-recepcao").style.display = modoRecepcao ? "block" : "none";
+        document.getElementById("botoes-caixa").style.display = modoCaixa ? "flex" : "none";
+
+        if (modoRecepcao) {
+            const btnRecicla = document.getElementById("vd-enviar-pill");
+            if (btnRecicla) btnRecicla.style.display = configReciclaAtivo ? "flex" : "none";
+
+            const btnRetirada = document.getElementById("btn-retirada");
+            if (btnRetirada) btnRetirada.style.display = configRetiradaAtivo ? "flex" : "none";
+
+            const btnWhatsapp = document.getElementById("btn-whatsapp");
+            if (btnWhatsapp) btnWhatsapp.style.display = configAlocacaoAtivo ? "flex" : "none";
         }
 
-        // 2. Display do Supervisor (flutuante acima dos botões)
+        // Display do Supervisor (apenas recepção, mas escondido inicialmente)
         const divSupervisor = document.getElementById("vd-sup-display");
         if (divSupervisor) {
-            divSupervisor.style.display = "none"; // começa oculto, exibido apenas por verificarSupervisor()
+            divSupervisor.style.display = "none";
         }
 
-        // 3. Seção inteira de Mapeamento de Supervisor dentro do menu ⚙️
+        // Itens do modal de Configuração
         const secaoSupervisor = document.getElementById("vd-secao-supervisor");
         const hrSupervisor = document.getElementById("vd-hr-sup");
-        if (secaoSupervisor) secaoSupervisor.style.display = configSupervisorAtivo ? "block" : "none";
-        if (hrSupervisor) hrSupervisor.style.display = configSupervisorAtivo ? "block" : "none";
+        if (secaoSupervisor) secaoSupervisor.style.display = modoRecepcao ? "block" : "none";
+        if (hrSupervisor) hrSupervisor.style.display = modoRecepcao ? "block" : "none";
 
-        // 4. Botão de Consultar Retirada (na tela principal)
-        const btnRetirada = document.getElementById("btn-retirada");
-        if (btnRetirada) {
-            btnRetirada.style.display = configRetiradaAtivo ? "flex" : "none";
-        }
+        const secaoCaixa = document.getElementById("vd-secao-caixa");
+        const hrCaixa = document.getElementById("vd-hr-caixa");
+        if (secaoCaixa) secaoCaixa.style.display = modoCaixa ? "block" : "none";
+        if (hrCaixa) hrCaixa.style.display = modoCaixa ? "block" : "none";
 
-        // 5. Botão de Solicitar Alocação (na tela principal)
-        const btnWhatsapp = document.getElementById("btn-whatsapp");
-        if (btnWhatsapp) {
-            btnWhatsapp.style.display = configAlocacaoAtivo ? "flex" : "none";
+        // Oculta os selects de recepção completamente no modo caixa
+        const secaoRecepcao = document.getElementById("vd-secao-recepcao");
+        if (secaoRecepcao) secaoRecepcao.style.display = modoRecepcao ? "block" : "none";
+
+        const hrMiddle = document.getElementById("vd-hr");
+        if (hrMiddle) hrMiddle.style.display = modoRecepcao ? "block" : "none";
+
+        // Status Ball dos Combos
+        const ball = document.getElementById("combo-status-ball");
+        if (ball) ball.style.display = (modoCaixa && configCombosAtivo) ? "block" : "none";
+
+        // Badge do monitor (vamos desativá-lo pois agora o botão faz as vezes de badge)
+        const monitorBadge = document.getElementById("vd-monitor-badge");
+        if (monitorBadge) monitorBadge.style.display = "none";
+
+        // Executa verificação inicial
+        if (modoRecepcao) {
+            verificarSupervisor();
         }
     }
 
@@ -388,8 +551,8 @@ function inicializarExtensao() {
 
     // === VERIFICAÇÕES DE DADOS E EVENTOS ===
     function verificarSupervisor() {
-        // Se o mapeamento de supervisor estiver desativado no popup, silencia completamente
-        if (!configSupervisorAtivo) {
+        // Se estiver no modo caixa ou o mapeamento de supervisor estiver desativado no popup, silencia
+        if (configModoPrincipal !== "recepcao" || !configSupervisorAtivo) {
             const displayBox = document.getElementById("vd-sup-display");
             if (displayBox) displayBox.style.display = "none";
             return;
@@ -449,8 +612,8 @@ function inicializarExtensao() {
     }
 
     function verificarRetirada(isAutomatico) {
-      // Se for verificação automática provocada pelo timer e a verificação automática estiver desativada no popup, ignora
-      if (isAutomatico && !configRetiradaAtivo) {
+      // Se for verificação automática provocada pelo timer e não estiver no modo recepcao ou o toggle estiver desligado, ignora
+      if (isAutomatico && (configModoPrincipal !== "recepcao" || !configRetiradaAtivo)) {
           return;
       }
 
@@ -578,6 +741,372 @@ function inicializarExtensao() {
               btn.classList.remove("enviado"); 
           }, 2500);
       });
+    }
+
+    // === MODO CAIXAS (MONITOR DE RECICLA) ===
+    // Verifica na planilha se o revendedor atual tem recicla disponível (mesma lógica do Violentmonkey)
+    let monitorNotificacaoEnviada = false;
+
+    function verificarReciclaCaixa(nomeRevendedor) {
+        const badge = document.getElementById("vd-badge-boti-caixa");
+        if (!badge || configModoPrincipal !== "caixa") return;
+
+        const urlRecicla = getUrlRecicla();
+        if (!urlRecicla) return;
+
+        const primeiroNome = nomeRevendedor.split(" ")[0] || "REVENDEDOR";
+
+        // Feedback visual: verificando...
+        badge.innerText = "⏳ VERIFICANDO...";
+        badge.style.borderColor = "#1a47d4";
+        badge.style.color = "#1a47d4";
+        badge.style.background = "#fff";
+        monitorNotificacaoEnviada = false;
+
+        const urlCompleta = urlRecicla + "?nome=" + encodeURIComponent(nomeRevendedor);
+
+        chrome.runtime.sendMessage({
+            action: "fetch",
+            url: urlCompleta,
+            options: { method: "GET" }
+        }, function(response) {
+            if (chrome.runtime.lastError || !response || !response.success) {
+                badge.innerText = "❌ ERRO DE CONEXÃO";
+                badge.style.borderColor = "#c62828";
+                badge.style.color = "#c62828";
+                return;
+            }
+
+            try {
+                const dados = JSON.parse(response.text);
+
+                if (dados.utilizado) {
+                    // Já utilizou neste ciclo
+                    badge.innerText = "🚫 " + primeiroNome + " - JÁ UTILIZOU";
+                    badge.style.borderColor = "#c62828";
+                    badge.style.color = "#c62828";
+                    badge.style.background = "#fff5f5";
+                } else if (dados.encontrado) {
+                    // TEM recicla!
+                    badge.innerText = "⚠️ " + primeiroNome + " TEM BOTI RECICLA!";
+                    badge.style.borderColor = "#e65100";
+                    badge.style.color = "#e65100";
+                    badge.style.background = "#fff8e1";
+
+                    // Dispara notificação nativa (igual Violentmonkey)
+                    if (!monitorNotificacaoEnviada) {
+                        monitorNotificacaoEnviada = true;
+                        dispararNotificacaoMonitor(primeiroNome);
+                    }
+                } else {
+                    // Livre
+                    badge.innerText = "✅ " + primeiroNome + " NÃO TEM BOTI";
+                    badge.style.borderColor = "#2e7d32";
+                    badge.style.color = "#2e7d32";
+                    badge.style.background = "#f1f8e9";
+                }
+            } catch (e) {
+                badge.innerText = "❌ ERRO NOS DADOS";
+                badge.style.borderColor = "#c62828";
+                badge.style.color = "#c62828";
+            }
+        });
+    }
+
+    function dispararNotificacaoMonitor(primeiroNome) {
+        if (!("Notification" in window)) return;
+
+        const disparar = () => {
+            new Notification("♻️ Boti Recicla Encontrado!", {
+                body: `Atenção: ${primeiroNome} TEM BOTI RECICLA disponível!`,
+                icon: "https://www.boticario.com.br/favicon.ico"
+            });
+        };
+
+        if (Notification.permission === "granted") {
+            disparar();
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(p => { if (p === "granted") disparar(); });
+        }
+    }
+
+    // === GERENCIAMENTO DE USUÁRIOS - CAIXA ===
+    function carregarSelectCaixas() {
+        const select = document.getElementById("vd-select-caixa");
+        const atual = select.value;
+        select.innerHTML = '<option value="">-- Selecione --</option>';
+        configUsuariosCaixa.forEach(u => {
+            const opt = document.createElement("option");
+            opt.value = u; opt.text = u;
+            if (u === atual) opt.selected = true;
+            select.appendChild(opt);
+        });
+    }
+
+    function renderCaixas() {
+        const lista = document.getElementById("vd-lista-caixas");
+        lista.innerHTML = "";
+
+        if (configUsuariosCaixa.length === 0) {
+            lista.innerHTML = "<div style='color:#777; text-align:center; padding: 10px;'>Nenhum caixa salvo.</div>";
+            return;
+        }
+
+        configUsuariosCaixa.forEach(nome => {
+            const item = document.createElement("div");
+            item.className = "vd-item-lista";
+            item.innerHTML = `
+                <div style="flex:1;"><b>${nome}</b></div>
+                <button class="vd-btn-del" data-nome="${nome}" title="Excluir">❌</button>
+            `;
+            lista.appendChild(item);
+        });
+
+        document.querySelectorAll("#vd-lista-caixas .vd-btn-del").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const nome = this.getAttribute("data-nome");
+                deletarCaixa(nome);
+            });
+        });
+    }
+
+    function deletarCaixa(nome) {
+        configUsuariosCaixa = configUsuariosCaixa.filter(u => u !== nome);
+        chrome.storage.local.set({ "vd_usuarios_caixa": configUsuariosCaixa }, () => {
+            const select = document.getElementById("vd-select-caixa");
+            if (select.value === nome) select.value = "";
+            carregarSelectCaixas();
+            renderCaixas();
+            vdStatus("Caixa removido!", "#ef4444");
+        });
+    }
+
+    function vdCadastrarCaixa() {
+        const input = document.getElementById("vd-novo-caixa");
+        const nome = input.value.trim().toUpperCase();
+        if (!nome) {
+            vdStatus("⚠️ Digite um nome!", "#ef4444");
+            return;
+        }
+        if (configUsuariosCaixa.includes(nome)) {
+            vdStatus("⚠️ Já cadastrado!", "#ef4444");
+            return;
+        }
+
+        configUsuariosCaixa.push(nome);
+        chrome.storage.local.set({ "vd_usuarios_caixa": configUsuariosCaixa }, () => {
+            input.value = "";
+            carregarSelectCaixas();
+            renderCaixas();
+            document.getElementById("vd-select-caixa").value = nome;
+            vdStatus("Caixa cadastrado!", "#27ae60");
+        });
+    }
+
+    function lancarCupomCaixa() {
+        if (!configCupomCaixa) {
+            vdStatus("⚠️ Cadastre um cupom nas configurações (⚙️)!", "#ef4444");
+            document.getElementById("vd-config-box").style.display = "flex";
+            return;
+        }
+
+        const usuario = document.getElementById("vd-select-caixa").value;
+        if (!usuario) {
+            vdStatus("⚠️ Selecione um Recebedor (Caixa) nas configurações!", "#ef4444");
+            document.getElementById("vd-config-box").style.display = "flex";
+            return;
+        }
+
+        // Tenta encontrar o campo de cupom na tela (SGI). Como o ID exato não foi informado, 
+        // procuramos por campos de texto de código promocional comuns ou deixamos um aviso caso não ache
+        let campoAlvo = document.activeElement; // Se o usuário clicou no campo antes de clicar no botão
+        
+        // Exemplo genérico de tentar inserir no elemento atualmente focado ou buscar um por ID se conhecido
+        // Pode ser substituído futuramente pelo ID exato fornecido pelo usuário.
+        
+        const badgeBtn = document.getElementById("vd-btn-lancar-caixa");
+        const originalText = badgeBtn.innerText;
+        badgeBtn.innerText = "Enviando...";
+
+        // Envia o registro do Recicla da mesma forma que a Recepção envia, mas marcando que foi recebido no Caixa
+        const cod = document.getElementById("ContentPlaceHolder1_cltBuscaPessoa_codigoEntradaNumero_Tb1");
+        const nom = document.getElementById("ContentPlaceHolder1_cltBuscaPessoa_nomeEntradaTexto_Tb1");
+        
+        let dadosRecicla = { 
+            codigo: cod ? cod.value : "", 
+            nome: nom ? nom.value : "Caixa Avulso", 
+            usuario: usuario, 
+            cupom: configCupomCaixa, 
+            acao: "baixa_caixa" 
+        };
+
+        chrome.runtime.sendMessage({
+            action: "fetch",
+            url: getUrlRecicla(),
+            options: {
+                method: "POST",
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify(dadosRecicla)
+            }
+        }, function(response) {
+            if (chrome.runtime.lastError || !response || !response.success) {
+                console.error("Erro ao enviar Recicla Caixa:", chrome.runtime.lastError || response);
+                badgeBtn.innerText = "Erro!";
+                setTimeout(() => badgeBtn.innerText = originalText, 2500);
+                return;
+            }
+
+            badgeBtn.innerText = "LANÇADO ✅";
+            // Tenta copiar para a área de transferência caso não consiga injetar
+            navigator.clipboard.writeText(configCupomCaixa).then(() => {
+                vdStatus(`Cupom ${configCupomCaixa} copiado e registrado!`, "#27ae60");
+            }).catch(e => {
+                vdStatus("Recicla registrado (Erro ao copiar cupom)", "#c5a059");
+            });
+
+            setTimeout(() => badgeBtn.innerText = originalText, 2500);
+        });
+    }
+
+    // === MODO CAIXAS: NOTIFICAÇÃO PREMIUM DE COMBOS (ESTRUTURA ORIGINAL DO USUÁRIO) ===
+    const cacheKey = "bancoCombosBoticario_v9"; 
+    const cacheTimeKey = "bancoCombosBoticarioTime_v9";
+    let bancoDeCombos = {};
+    let carregandoCombos = true;
+    let bloqueandoEnterOriginal = false; 
+    let ignorarInterceptacao = false;
+
+    function carregarBancoCombos(forcarAtualizacao = false) {
+        chrome.storage.local.get(["vd_url_combos"], (data) => {
+            const urlPlanilha = data.vd_url_combos;
+            if (!urlPlanilha) {
+                statusBall.classList.add('erro');
+                statusBall.title = "Configure a URL da planilha de Combos nas configurações da extensão.";
+                return;
+            }
+
+            const cachedData = localStorage.getItem(cacheKey);
+            const cachedTime = localStorage.getItem(cacheTimeKey);
+            const cacheExpiration = 1000 * 60 * 60 * 12; 
+            const now = Date.now();
+
+            if (cachedData) {
+                bancoDeCombos = JSON.parse(cachedData);
+                carregandoCombos = false;
+                statusBall.classList.add('carregado');
+            } else {
+                statusBall.className = '';
+            }
+
+            if (forcarAtualizacao || !cachedData || !cachedTime || (now - parseInt(cachedTime)) > cacheExpiration) {
+                if (forcarAtualizacao) { carregandoCombos = true; statusBall.className = ''; }
+                
+                chrome.runtime.sendMessage({
+                    action: "fetch",
+                    url: urlPlanilha,
+                    options: { method: "GET" }
+                }, function(res) {
+                    if (chrome.runtime.lastError || !res || !res.success) {
+                        if(Object.keys(bancoDeCombos).length === 0) statusBall.classList.add('erro');
+                        return;
+                    }
+                    try {
+                        bancoDeCombos = JSON.parse(res.text);
+                        localStorage.setItem(cacheKey, JSON.stringify(bancoDeCombos));
+                        localStorage.setItem(cacheTimeKey, Date.now().toString());
+                        carregandoCombos = false; 
+                        statusBall.classList.remove('erro');
+                        statusBall.classList.add('carregado');
+                    } catch (e) { 
+                        if(Object.keys(bancoDeCombos).length === 0) statusBall.classList.add('erro'); 
+                    }
+                });
+            }
+        });
+    }
+
+    statusBall.addEventListener('click', () => { if (!carregandoCombos) carregarBancoCombos(true); });
+
+    // INTERCEPTAÇÃO DE TECLAS
+    window.addEventListener('keydown', function(e) {
+        if (configModoPrincipal !== "caixa" || !configCombosAtivo) return;
+
+        if (e.key === 'Enter' && !carregandoCombos && !ignorarInterceptacao) {
+            const input = e.target;
+            const codLidoOriginal = input.value.trim();
+            if (!codLidoOriginal) return;
+
+            let codLidoBusca = codLidoOriginal;
+            if (codLidoOriginal.length === 13 && /^\d+$/.test(codLidoOriginal)) {
+                codLidoBusca = codLidoOriginal.substring(7, 12); 
+            }
+
+            let comboEncontrado = null;
+            for (let chaveBanco in bancoDeCombos) {
+                let codigosIndividuais = chaveBanco.split(/[,/;\s-]+/).map(c => c.trim()).filter(c => c.length > 0);
+                
+                if (codigosIndividuais.includes(codLidoBusca)) {
+                    if (codLidoBusca !== bancoDeCombos[chaveBanco].codigoCombo && codLidoOriginal !== bancoDeCombos[chaveBanco].codigoCombo) {
+                        comboEncontrado = bancoDeCombos[chaveBanco];
+                    }
+                    break;
+                }
+            }
+
+            if (comboEncontrado) {
+                // AQUI É O PAUSE! Segura o Enter original
+                bloqueandoEnterOriginal = true; 
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                
+                input.value = ''; // Limpa pra não lançar sozinho e pro operador digitar o combo
+                
+                abrirModalCombo(comboEncontrado, input, codLidoOriginal);
+            } else {
+                flutuanteCombo.classList.remove('show');
+            }
+        }
+    }, true);
+
+    window.addEventListener('keypress', function(e) { if (configModoPrincipal === "caixa" && configCombosAtivo && e.key === 'Enter' && bloqueandoEnterOriginal) { e.preventDefault(); e.stopImmediatePropagation(); } }, true);
+    window.addEventListener('keyup', function(e) { if (configModoPrincipal === "caixa" && configCombosAtivo && e.key === 'Enter' && bloqueandoEnterOriginal) { e.preventDefault(); e.stopImmediatePropagation(); bloqueandoEnterOriginal = false; } }, true);
+
+    // FUNÇÃO "PLAY" AJUSTADA PARA O ASP.NET
+    function darPlayNoFluxo(inputOriginal, codOriginal) {
+        ignorarInterceptacao = true; 
+        
+        inputOriginal.focus();
+        
+        // 1. Força o preenchimento na raiz do sistema
+        let nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+        if (nativeInputValueSetter) {
+            nativeInputValueSetter.call(inputOriginal, codOriginal);
+        } else {
+            inputOriginal.value = codOriginal;
+        }
+
+        // 2. Avisa o SGI que o texto entrou na caixinha
+        inputOriginal.dispatchEvent(new Event('input', { bubbles: true }));
+
+        // 3. Dá o Enter exato (usando keypress que é o padrão de submissão do ASP.NET)
+        setTimeout(() => {
+            inputOriginal.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+            setTimeout(() => ignorarInterceptacao = false, 500); 
+        }, 100);
+    }
+
+    function abrirModalCombo(dados, inputOriginal, codIndividualOriginal) {
+        document.getElementById('foto-combo').src = dados.imagem;
+        document.getElementById('nome-combo').textContent = dados.nome;
+        document.getElementById('codigo-combo').textContent = dados.codigoCombo;
+        
+        flutuanteCombo.classList.add('show');
+
+        // BOTÃO FECHAR (aciona o Play com o novo ajuste)
+        document.getElementById('btn-fechar').onclick = function() { 
+            flutuanteCombo.classList.remove('show'); 
+            darPlayNoFluxo(inputOriginal, codIndividualOriginal);
+        };
     }
 
     // Inicia a carga de dados armazenados de forma assíncrona
