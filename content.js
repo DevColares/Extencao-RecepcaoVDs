@@ -558,7 +558,11 @@ function inicializarExtensao() {
             return;
         }
 
-        const estInput = document.getElementById("ContentPlaceHolder1_descEstruturaComercialAtual_Tb1");
+        // Busca o campo de estrutura comercial por NAME (formato ASP.NET com $) e por ID (formato com _)
+        const estInput = document.getElementsByName("ctl00$ContentPlaceHolder1$descEstruturaComercialAtual$Tb1")[0]
+                      || document.getElementById("ContentPlaceHolder1_descEstruturaComercialAtual_Tb1")
+                      || document.querySelector("input[name$='descEstruturaComercialAtual$Tb1']")
+                      || document.querySelector("input[id$='descEstruturaComercialAtual_Tb1']");
         const estruturaAtual = estInput ? estInput.value.trim().toUpperCase() : "";
         const displayBox = document.getElementById("vd-sup-display");
         const displayText = document.getElementById("vd-sup-nome-text");
@@ -570,8 +574,14 @@ function inicializarExtensao() {
 
         let supervisorEncontrado = "Não Mapeado";
 
+        // Extrai o último nome/palavra da estrutura (ex: "Setor 20393 - EQUIPE BLOSSOM" → "BLOSSOM")
+        const palavras = estruturaAtual.split(/[\s\-]+/).filter(p => p.length > 0);
+        const ultimoNomeEstrutura = palavras.length > 0 ? palavras[palavras.length - 1] : "";
+
         for (let chave in configSupervisores) {
-            if (estruturaAtual.includes(chave)) {
+            const chaveUpper = chave.toUpperCase();
+            // Compara pelo último nome da estrutura OU pelo includes tradicional
+            if (ultimoNomeEstrutura === chaveUpper || estruturaAtual.includes(chaveUpper)) {
                 supervisorEncontrado = configSupervisores[chave];
                 break;
             }
