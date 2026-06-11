@@ -18,6 +18,8 @@ window.SGI.state = {
 
     ultimoNomeConsultado: "",
     ultimoNomeMonitorado: "",
+    ultimoCodigoConsultado: "",
+    ultimoCodigoMonitorado: "",
     notificacaoEnviada: false,
     monitorNotificacaoEnviada: false
 };

@@ -1,34 +1,60 @@
-const urlAtual = window.location.href;
+const urlAtual = window.location.href.toLowerCase();
+// Agora o script roda em todo o domínio SGI para gerenciar a limpeza de memória
+const isDominioSGI = urlAtual.includes("sgi.e-boticario.com.br");
 
-chrome.storage.local.get(["vd_urls_permitidas"], (data) => {
-    const urlsPermitidas = data.vd_urls_permitidas || [];
-    let deveAtivar = false;
-
-    if (urlsPermitidas.length === 0) {
-        if (urlAtual.includes("/Paginas/GestaoRede/")) {
-            deveAtivar = true;
-        }
+if (isDominioSGI) {
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", inicializarExtensao);
     } else {
+        inicializarExtensao();
+    }
+} else {
+    // Verificação de URLs customizadas (se houver)
+    chrome.storage.local.get(["vd_urls_permitidas"], (data) => {
+        const urlsPermitidas = data.vd_urls_permitidas || [];
         for (let padrao of urlsPermitidas) {
-            if (urlAtual.includes(padrao)) {
-                deveAtivar = true;
+            if (urlAtual.includes(padrao.toLowerCase())) {
+                inicializarExtensao();
                 break;
             }
         }
-    }
-
-    if (deveAtivar) {
-        inicializarExtensao();
-    }
-});
+    });
+}
 
 function inicializarExtensao() {
-    window.SGI.ui.inicializarPainel();
+    // Se já foi inicializado (evita duplicidade em alguns eventos)
+    if (window.SGI._initialized) return;
+    window.SGI._initialized = true;
+
+    const url = window.location.href.toLowerCase();
+    const isPaginaAtiva = url.includes("/paginas/gestaorede/") || 
+                          url.includes("realizarpedidopdv.aspx") || 
+                          url.includes("pagamento");
+
+    // Só cria o painel no DOM se for uma página onde ele deve aparecer para evitar flicker no menu
+    if (isPaginaAtiva) {
+        window.SGI.ui.inicializarPainel();
+    }
 
     const getEl = id => document.getElementById(id);
     
-    if(getEl("vd-gear")) getEl("vd-gear").addEventListener("click", window.SGI.ui.vdToggleConfig);
-    if(getEl("vd-gear-caixa")) getEl("vd-gear-caixa").addEventListener("click", window.SGI.ui.vdToggleConfig);
+    // Recupera estado do painel de config (aberto/fechado)
+    if (isPaginaAtiva && sessionStorage.getItem("vd_config_aberta") === "true") {
+        const box = getEl("vd-config-box");
+        if (box) box.style.display = "flex";
+    }
+
+    if(getEl("vd-gear")) getEl("vd-gear").addEventListener("click", () => {
+        window.SGI.ui.vdToggleConfig();
+        const box = getEl("vd-config-box");
+        sessionStorage.setItem("vd_config_aberta", box.style.display === "flex" ? "true" : "false");
+    });
+    
+    if(getEl("vd-gear-caixa")) getEl("vd-gear-caixa").addEventListener("click", () => {
+        window.SGI.ui.vdToggleConfig();
+        const box = getEl("vd-config-box");
+        sessionStorage.setItem("vd_config_aberta", box.style.display === "flex" ? "true" : "false");
+    });
     if(getEl("vd-salvar")) getEl("vd-salvar").addEventListener("click", window.SGI.recepcao.vdCadastrar);
     if(getEl("vd-salvar-sup")) getEl("vd-salvar-sup").addEventListener("click", window.SGI.supervisor.vdSalvarSupervisor);
     if(getEl("vd-salvar-caixa")) getEl("vd-salvar-caixa").addEventListener("click", window.SGI.caixa.vdCadastrarCaixa);
@@ -51,10 +77,22 @@ function inicializarExtensao() {
     });
     
     if(getEl("vd-btn-atualizar-caixa")) getEl("vd-btn-atualizar-caixa").addEventListener("click", () => {
+        // Limpa TUDO para forçar consulta real
         window.SGI.state.ultimoNomeMonitorado = ""; 
-        const nomInput = document.getElementById("ContentPlaceHolder1_cltBuscaPessoa_nomeEntradaTexto_Tb1");
-        if (nomInput && nomInput.value.trim() !== "") {
-            window.SGI.caixa.verificarReciclaCaixa(nomInput.value.trim());
+        window.SGI.state.ultimoCodigoMonitorado = ""; 
+        sessionStorage.removeItem("vd_cache_status");
+        sessionStorage.removeItem("vd_cache_identidade");
+
+        const btnLancar = document.getElementById("vd-btn-lancar-caixa");
+        if (btnLancar) {
+            btnLancar.disabled = true;
+            btnLancar.style.opacity = "0.5";
+        }
+
+        const nome = window.SGI.helpers.getSGINome();
+        const codigo = window.SGI.helpers.getSGICodigo();
+        if (nome !== "" || codigo !== "") {
+            window.SGI.caixa.verificarReciclaCaixa(nome, codigo);
         }
     });
     
@@ -68,40 +106,135 @@ function inicializarExtensao() {
         });
     });
 
+    // Verifica se saímos da página de PDV para limpar o estado
+    const verificarSaidaPDV = () => {
+        const url = window.location.href.toLowerCase();
+        
+        // No PDV real (Pedido ou Pagamento)
+        const isNoPDVAtivo = url.includes("realizarpedidopdv.aspx") || url.includes("pagamento");
+        
+        // Telas de conclusão/pós-venda que indicam que o atendimento acabou
+        const isConcluido = url.includes("impressao") || url.includes("concluido") || url.includes("finalizado") || url.includes("sucesso");
+        
+        // Se não estamos no PDV ativo OU se já chegamos na tela de conclusão, limpamos a memória
+        if (!isNoPDVAtivo || isConcluido) {
+            if (sessionStorage.getItem("vd_em_andamento") === "true" || sessionStorage.getItem("vd_cache_status")) {
+                // Se for conclusão, só limpamos se NÃO houver algo em andamento (ou limpamos tudo de vez)
+                // Para garantir que "volte e checa novamente", limpamos tudo.
+                console.log("Fluxo de PDV encerrado ou Saída detectada. Limpando estados.");
+                sessionStorage.removeItem("vd_em_andamento");
+                sessionStorage.removeItem("vd_usuario_ativo");
+                sessionStorage.removeItem("vd_nome_cliente");
+                sessionStorage.removeItem("vd_codigo_cliente");
+                sessionStorage.removeItem("vd_cupom_detectado");
+                sessionStorage.removeItem("vd_cupom");
+                sessionStorage.removeItem("vd_cache_status");
+                sessionStorage.removeItem("vd_cache_identidade");
+                
+                window.SGI.state.ultimoNomeMonitorado = "";
+                window.SGI.state.ultimoCodigoMonitorado = "";
+                window.SGI.state.ultimoNomeConsultado = "";
+                window.SGI.state.ultimoCodigoConsultado = "";
+            }
+        }
+    };
+
+    verificarSaidaPDV();
+
     setInterval(() => {
-        const nomInput = document.getElementById("ContentPlaceHolder1_cltBuscaPessoa_nomeEntradaTexto_Tb1");
-        const nomeAtual = nomInput ? nomInput.value.trim() : "";
+        verificarSaidaPDV(); // Monitora navegação interna se houver
+        const nomeAtual = window.SGI.helpers.getSGINome();
+        const codigoAtual = window.SGI.helpers.getSGICodigo();
         const st = window.SGI.state;
 
-        if (nomeAtual !== "" && nomeAtual !== st.ultimoNomeConsultado) {
+        // Se o nome e código estão vazios, reseta os controles de consulta
+        if (nomeAtual === "" && codigoAtual === "") {
+            // Se estamos no PDV, mantemos o último status verificado no badge via cache da sessão
+            // Caso contrário, resetamos tudo.
+            const url = window.location.href.toLowerCase();
+            const isPDV = url.includes("realizarpedidopdv.aspx") || url.includes("pagamento");
+            
+            if (!isPDV) {
+                st.ultimoNomeConsultado = "";
+                st.ultimoCodigoConsultado = "";
+                st.ultimoNomeMonitorado = "";
+                st.ultimoCodigoMonitorado = "";
+                window.SGI.caixa.verificarReciclaCaixa("", ""); // Limpa o badge
+            } else {
+                // No PDV mas sem nome visível: tenta restaurar o badge do cache
+                window.SGI.caixa.verificarReciclaCaixa("", "");
+            }
+            return;
+        }
+
+        // Se o nome ou código mudou em relação à consulta geral (Recepção/Supervisor)
+        if (nomeAtual !== st.ultimoNomeConsultado || codigoAtual !== st.ultimoCodigoConsultado) {
+            // Verifica se a mudança é real ou se é apenas o primeiro carregamento pós-postback
+            const cacheIdentidade = sessionStorage.getItem("vd_cache_identidade");
+            let isMudancaReal = true;
+            if (cacheIdentidade) {
+                const ident = JSON.parse(cacheIdentidade);
+                if (ident.nome === nomeAtual && ident.codigo === codigoAtual) {
+                    isMudancaReal = false;
+                }
+            }
+
             st.ultimoNomeConsultado = nomeAtual;
-            st.notificacaoEnviada = false; 
+            st.ultimoCodigoConsultado = codigoAtual;
+            st.notificacaoEnviada = false;
+
+            if (isMudancaReal) {
+                sessionStorage.removeItem("vd_cache_status");
+                sessionStorage.removeItem("vd_cache_identidade");
+            }
+
             window.SGI.recepcao.verificarRetirada(true);
             window.SGI.supervisor.verificarSupervisor();
+        }
 
-            if (st.configModoPrincipal === "caixa" && nomeAtual !== st.ultimoNomeMonitorado) {
-                st.ultimoNomeMonitorado = nomeAtual;
-                window.SGI.caixa.verificarReciclaCaixa(nomeAtual);
-            }
+        // Se o nome ou código mudou em relação ao monitoramento do Caixa (Boti Recicla)
+        // ou se acabamos de entrar no modo caixa para um nome que já estava no SGI
+        if (st.configModoPrincipal === "caixa" && (nomeAtual !== st.ultimoNomeMonitorado || codigoAtual !== st.ultimoCodigoMonitorado)) {
+            st.ultimoNomeMonitorado = nomeAtual;
+            st.ultimoCodigoMonitorado = codigoAtual;
+            window.SGI.caixa.verificarReciclaCaixa(nomeAtual, codigoAtual);
         }
     }, 1000);
 
     window.SGI.api.carregarConfiguracoesIniciais(() => {
         const st = window.SGI.state;
         const getEl = id => document.getElementById(id);
+
+        // Restaura estados de consulta do cache IMEDIATAMENTE para evitar limpeza no postback
+        const cacheIdentidade = sessionStorage.getItem("vd_cache_identidade");
+        if (cacheIdentidade) {
+            const ident = JSON.parse(cacheIdentidade);
+            st.ultimoNomeConsultado = ident.nome || "";
+            st.ultimoCodigoConsultado = ident.codigo || "";
+            st.ultimoNomeMonitorado = ident.nome || "";
+            st.ultimoCodigoMonitorado = ident.codigo || "";
+        }
+
+        // Aplica configurações visuais
+        window.SGI.ui.aplicarConfiguracoesVisuais();
         
+        // Restaura badge do cache IMEDIATAMENTE se estivermos no PDV
+        const url = window.location.href.toLowerCase();
+        const isPDV = url.includes("realizarpedidopdv.aspx") || url.includes("pagamento");
+        if (isPDV && st.configModoPrincipal === "caixa") {
+            window.SGI.caixa.verificarReciclaCaixa("", "");
+        }
+
         if(getEl("vd-escala")) getEl("vd-escala").value = st.configScale;
         window.SGI.helpers.aplicarEscala(st.configScale);
 
         window.SGI.supervisor.renderMapeamentos();
         window.SGI.recepcao.carregarSelectUsuarios();
         window.SGI.recepcao.renderUsuarios();
-        
+
         if(getEl("vd-cupom-caixa")) getEl("vd-cupom-caixa").value = st.configCupomCaixa;
         window.SGI.caixa.carregarSelectCaixas();
         window.SGI.caixa.renderCaixas();
-
-        window.SGI.ui.aplicarConfiguracoesVisuais();
         
         if (st.configModoPrincipal === "caixa" && st.configCombosAtivo) {
             window.SGI.combos.carregarBancoCombos(false);
@@ -114,4 +247,17 @@ function inicializarExtensao() {
     if (sessionStorage.getItem("vd_em_andamento") === "true") {
         window.SGI.caixa.iniciarVerificacaoFinal();
     }
-}
+
+    // Listener para mudanças no storage (ex: trocar modo no popup)
+    chrome.storage.onChanged.addListener((changes) => {
+        window.SGI.api.carregarConfiguracoesIniciais(() => {
+            // Força re-verificação se o modo mudou
+            if (changes.vd_modo_principal) {
+                window.SGI.state.ultimoNomeMonitorado = "";
+                window.SGI.state.ultimoCodigoMonitorado = "";
+            }
+            window.SGI.ui.aplicarConfiguracoesVisuais();
+            console.log("Configurações do SGI atualizadas via Storage.");
+        });
+    });
+    }

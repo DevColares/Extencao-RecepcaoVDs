@@ -33,7 +33,6 @@
   align-items: flex-end;
   gap: 12px;
   transform-origin: bottom right;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Caixa de Configurações - Glassmorphism Premium */
@@ -54,7 +53,6 @@
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--boti-accent) rgba(0,0,0,0.05);
-  animation: vdFadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 #vd-config-box::-webkit-scrollbar {
@@ -244,7 +242,6 @@
   text-transform: uppercase;
   box-shadow: var(--boti-shadow-soft);
   display: none;
-  animation: vdFadeInUp 0.3s ease;
 }
 
 #vd-sup-nome-text {
@@ -271,14 +268,12 @@
   align-items: center;
   justify-content: center;
   box-shadow: var(--boti-shadow-soft);
-  transition: all 0.25s ease;
 }
 
 #vd-gear:hover {
   background: #ffffff;
   border-color: var(--boti-accent);
   color: var(--boti-accent);
-  transform: rotate(45deg);
 }
 
 /* Botões do SGI Premium */
@@ -292,7 +287,6 @@
   font-family: var(--boti-font);
   letter-spacing: 0.6px;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: flex;
   align-items: center;
   justify-content: center;

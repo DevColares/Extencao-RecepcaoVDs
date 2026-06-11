@@ -2,11 +2,11 @@ window.SGI = window.SGI || {};
 
 window.SGI.ui = {
     inicializarPainel: function() {
-        const painelAntigo = document.getElementById("painelVD");
-        if (painelAntigo) painelAntigo.remove();
+        if (document.getElementById("painelVD")) return;
 
         const painel = document.createElement("div");
         painel.id = "painelVD";
+        // ... (rest of the innerHTML remains same as before)
         painel.innerHTML = `
       <!-- CAIXA DE CONFIGURAÇÕES -->
       <div id="vd-config-box">
@@ -69,7 +69,7 @@ window.SGI.ui = {
       </div>
 
       <!-- BADGE DO MODO CAIXAS (MONITOR) -->
-      <div id="vd-monitor-badge" style="display:none; background:#fff; border:2px solid #1a47d4; color:#1a47d4; font-weight:bold; font-size:13px; text-transform:uppercase; padding:8px 15px; text-align:center; font-family:Arial,Helvetica,sans-serif; margin-bottom:6px; box-shadow:0 2px 4px rgba(0,0,0,.05);">⏳ MODO CAIXAS ATIVO</div>
+      <div id="vd-monitor-badge" style="display:none; background:#fff; border:2px solid #1a47d4; color:#1a47d4; font-weight:bold; font-size:13px; text-transform:uppercase; padding:8px 15px; text-align:center; font-family:Arial,Helvetica,sans-serif; margin-bottom:6px; box-shadow:0 2px 4px rgba(0,0,0,.05);">MODO CAIXAS ATIVO</div>
 
       <!-- BOTÕES PRINCIPAIS -->
       <div id="botoes-container">
@@ -88,7 +88,7 @@ window.SGI.ui = {
         <div id="botoes-caixa" style="display:none; flex-direction: row; gap: 6px; align-items: center; justify-content: center;">
           <button id="vd-btn-atualizar-caixa" title="Atualizar Verificação" style="width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; border: 1px solid #1a47d4; background: #fff; color: #1a47d4; border-radius: 4px; cursor: pointer; font-size: 16px;">🔄</button>
           <button id="vd-gear-caixa" title="Configurações do Caixa" style="width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; border: 1px solid #c5a059; background: #fff; border-radius: 4px; cursor: pointer; font-size: 16px;">⚙️</button>
-          <button id="vd-badge-boti-caixa" style="flex: 1; height: 36px; font-size: 11px; font-weight: bold; border: 2px solid #ccc; background: #fff; border-radius: 4px; color: #555; pointer-events: none;">⏳ VERIFICANDO</button>
+          <button id="vd-badge-boti-caixa" style="flex: 1; height: 36px; font-size: 11px; font-weight: bold; border: 2px solid #ccc; background: #fff; border-radius: 4px; color: #555; pointer-events: none;">AGUARDANDO...</button>
           <button id="vd-btn-lancar-caixa" style="height: 36px; padding: 0 10px; border: none; background: #1a47d4; color: #fff; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 4px;">➡️ LANÇAR</button>
         </div>
       </div>
@@ -175,6 +175,20 @@ window.SGI.ui = {
 
     aplicarConfiguracoesVisuais: function() {
         const st = window.SGI.state;
+        const url = window.location.href.toLowerCase();
+        
+        // Verifica se estamos em uma página que deve mostrar o painel
+        const isPaginaAtiva = url.includes("/paginas/gestaorede/") || 
+                              url.includes("realizarpedidopdv.aspx") || 
+                              url.includes("pagamento");
+
+        const painel = document.getElementById("painelVD");
+        if (painel) {
+            painel.style.display = isPaginaAtiva ? "flex" : "none";
+        }
+
+        if (!isPaginaAtiva) return;
+
         const modoRecepcao = st.configModoPrincipal === "recepcao";
         const modoCaixa = st.configModoPrincipal === "caixa";
 

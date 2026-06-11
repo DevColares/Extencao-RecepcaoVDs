@@ -34,5 +34,33 @@ window.SGI.helpers = {
             window.SGI.helpers.vdStatus("⚠️ URL de Combos não configurada! Acesse o popup da extensão.", "#ef4444");
         }
         return url;
+    },
+    getSGINome: function() {
+        const seletores = [
+            "input[id*='nomeEntradaTexto_Tb1']", 
+            "input[name*='nomeEntradaTexto$Tb1']", 
+            ".client-name", 
+            ".name",
+            "[id*='lblNomeRevendedor']", 
+            ".nome-revendedor",
+            ".text-left.menu-info"
+        ];
+        
+        for (let s of seletores) {
+            const el = document.querySelector(s);
+            if (el) {
+                let val = (el.tagName === "INPUT" ? el.value : el.innerText).trim();
+                // Se o valor não for apenas números e tiver pelo menos 3 caracteres, assumimos que é o nome
+                if (val && isNaN(val.replace(/\s/g, "")) && val.length > 2) {
+                    return val;
+                }
+            }
+        }
+        return "";
+    },
+    getSGICodigo: function() {
+        const el = document.querySelector("input[id*='codigoEntradaNumero_Tb1'], input[name*='codigoEntradaNumero$Tb1'], [id*='lblCodigoRevendedor'], .codigo-revendedor");
+        if (!el) return "";
+        return (el.tagName === "INPUT" ? el.value : el.innerText).trim();
     }
 };
