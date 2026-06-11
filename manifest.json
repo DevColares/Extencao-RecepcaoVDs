@@ -21,6 +21,15 @@
         "<all_urls>"
       ],
       "js": [
+        "src/config/state.js",
+        "src/config/constants.js",
+        "src/utils/helpers.js",
+        "src/services/api.js",
+        "src/ui/view-manager.js",
+        "src/features/supervisor.js",
+        "src/features/recepcao.js",
+        "src/features/caixa.js",
+        "src/features/combos.js",
         "content.js"
       ],
       "css": [
