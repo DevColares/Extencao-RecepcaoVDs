@@ -89,7 +89,7 @@ window.SGI.ui = {
           <button id="vd-btn-atualizar-caixa" title="Atualizar Verificação" style="width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; border: 1px solid #1a47d4; background: #fff; color: #1a47d4; border-radius: 4px; cursor: pointer; font-size: 16px;">🔄</button>
           <button id="vd-gear-caixa" title="Configurações do Caixa" style="width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; border: 1px solid #c5a059; background: #fff; border-radius: 4px; cursor: pointer; font-size: 16px;">⚙️</button>
           <button id="vd-badge-boti-caixa" style="flex: 1; height: 36px; font-size: 11px; font-weight: bold; border: 2px solid #ccc; background: #fff; border-radius: 4px; color: #555; pointer-events: none;">AGUARDANDO...</button>
-          <button id="vd-btn-lancar-caixa" style="height: 36px; padding: 0 10px; border: none; background: #1a47d4; color: #fff; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 4px;">➡️ LANÇAR</button>
+          <button id="vd-btn-lancar-caixa" disabled style="height: 36px; padding: 0 10px; border: none; background: #1a47d4; color: #fff; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 4px; opacity: 0.5; pointer-events: none;">➡️ LANÇAR</button>
         </div>
       </div>
     `;

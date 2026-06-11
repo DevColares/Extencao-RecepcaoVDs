@@ -96,9 +96,53 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Eventos de Backup
+  document.getElementById("btn-export-backup").addEventListener("click", exportarBackup);
+  document.getElementById("btn-import-backup").addEventListener("click", () => document.getElementById("file-import").click());
+  document.getElementById("file-import").addEventListener("change", importarBackup);
+
   // Exportar função para o escopo global usar na carga inicial
   window.setModoUI = setModo;
 });
+
+// Funções de Backup e Restauração
+function exportarBackup() {
+  chrome.storage.local.get(null, (data) => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const dataHora = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    a.href = url;
+    a.download = `sgi-boticario-backup-${dataHora}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    exibirStatus("Backup exportado com sucesso!", "#27ae60");
+  });
+}
+
+function importarBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const config = JSON.parse(e.target.result);
+      if (confirm("Isso irá substituir todas as configurações atuais. Deseja continuar?")) {
+        chrome.storage.local.clear(() => {
+          chrome.storage.local.set(config, () => {
+            exibirStatus("Configurações restauradas!", "#27ae60");
+            setTimeout(() => window.location.reload(), 1500);
+          });
+        });
+      }
+    } catch (err) {
+      exibirStatus("❌ Erro ao ler arquivo de backup!", "#ef4444");
+      console.error(err);
+    }
+  };
+  reader.readAsText(file);
+}
 
 // Carrega todas as configurações salvas no armazenamento nativo
 function carregarConfiguracoes() {

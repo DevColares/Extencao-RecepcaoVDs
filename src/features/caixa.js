@@ -261,6 +261,12 @@ window.SGI.caixa = {
     },
 
     lancarCupomCaixa: function() {
+        const badge = document.getElementById("vd-badge-boti-caixa");
+        if (badge && (badge.innerText.includes("JÁ UTILIZOU") || badge.innerText.includes("NÃO TEM CUPOM"))) {
+            window.SGI.helpers.vdStatus("⚠️ Lançamento bloqueado: Cupom indisponível.", "#ef4444");
+            return;
+        }
+
         const st = window.SGI.state;
         if (!st.configCupomCaixa) {
             window.SGI.helpers.vdStatus("⚠️ Cadastre um cupom nas configurações (⚙️)!", "#ef4444");
@@ -370,18 +376,20 @@ window.SGI.caixa = {
     },
 
     verificarNFEmitida: function() {
-        // Procura pelo ícone verde acompanhado do texto de NF emitida
+        // Procura especificamente pela imagem do bullet verde do SGI
+        const imgVerde = document.querySelector("img[src*='bullet-10-verde.gif']");
+        if (imgVerde) return true;
+
+        // Alternativa em tabelas específicas do PDV
         const celulas = document.querySelectorAll("td.td-pedido, td, span, b");
         for (let el of celulas) {
-            if (el.innerText.includes("NF Emitida")) {
-                const imgVerde = el.querySelector("img[src*='verde'], .verde, .bullet-10-verde") || 
-                                 el.parentElement.querySelector("img[src*='verde'], .verde, .bullet-10-verde") ||
-                                 document.querySelector("img[src*='verde'], .verde, .bullet-10-verde");
-                if (imgVerde) return true;
+            if (el.innerText.includes("NF Emitida") || el.innerText.includes("Nota Fiscal Emitida")) {
+                const img = el.querySelector("img[src*='verde']") || 
+                            el.parentElement.querySelector("img[src*='verde']");
+                if (img) return true;
             }
         }
-        // Fallback para seletores comuns
-        return document.querySelector(".nf-emitida, [id*='notaFiscal'].verde") !== null;
+        return false;
     },
 
     iniciarVerificacaoFinal: function() {
@@ -409,42 +417,42 @@ window.SGI.caixa = {
             
             if (cupomNaTela && !sessionStorage.getItem("vd_cupom_detectado")) {
                 sessionStorage.setItem("vd_cupom_detectado", "true");
-                window.SGI.helpers.vdStatus("✅ Cupom detectado na tela!", "#27ae60");
+                window.SGI.helpers.vdStatus("✅ Cupom detectado!", "#27ae60");
             }
 
             if (!sessionStorage.getItem("vd_cupom_detectado")) {
                 tentativasCupom++;
                 if (tentativasCupom >= MAX_TENTATIVAS) {
-                    console.warn("Timeout na detecção do cupom. Continuando sem confirmação rígida.");
-                    // Opcional: sessionStorage.setItem("vd_cupom_detectado", "false");
+                    console.warn("Timeout na detecção do cupom.");
                 }
             }
 
-            // PASSO B & C: Tela de Pagamento e NF Emitida
+            // PASSO B & C: Tela de Pagamento e NF Emitida (bullet-10-verde.gif)
             if (window.SGI.caixa.isPaginaPagamento()) {
-                if (window.SGI.caixa.verificarNFEmitida()) {
+                const nfEmitida = window.SGI.caixa.verificarNFEmitida();
+                const cupomDetectado = sessionStorage.getItem("vd_cupom_detectado") === "true";
+
+                if (nfEmitida && cupomDetectado) {
                     // PASSO D: Disparo para a Planilha
                     clearInterval(window.SGI.caixa._finalCheckInterval);
                     window.SGI.caixa._finalCheckInterval = null;
                     
+                    const operador = sessionStorage.getItem("vd_usuario_ativo") || "SGI";
+                    
                     const badge = document.getElementById("vd-badge-boti-caixa");
                     if (badge) {
-                        badge.innerText = "✅ " + primeiroNome + " - LANÇADO NA PLANILHA";
+                        badge.innerText = "✅ LANÇADO POR " + operador.split(" ")[0];
                         badge.style.borderColor = "#27ae60";
                         badge.style.color = "#27ae60";
                         badge.style.background = "#f1f8e9";
                     }
 
-                    const cupomDetectado = sessionStorage.getItem("vd_cupom_detectado") === "true";
-                    
-                    // Só envia se o cupom foi detectado (ou se decidir ignorar o timeout)
                     let dadosRecicla = { 
                         codigo: sessionStorage.getItem("vd_codigo_cliente") || "", 
                         nome: nomeCliente, 
-                        usuario: sessionStorage.getItem("vd_usuario_ativo") || "", 
+                        usuario: operador, // Este é o nome do operador do caixa
                         cupom: sessionStorage.getItem("vd_cupom") || st.configCupomCaixa, 
-                        acao: "baixa_caixa",
-                        confirmado: cupomDetectado
+                        acao: "baixa_caixa"
                     };
 
                     window.SGI.api.fetchData(urlRecicla, {
@@ -453,11 +461,11 @@ window.SGI.caixa = {
                         body: JSON.stringify(dadosRecicla)
                     }, function(response) {
                         if (response && response.success) {
-                            window.SGI.helpers.vdStatus("Baixa registrada com sucesso!", "#27ae60");
+                            window.SGI.helpers.vdStatus("Baixa registrada: " + operador, "#27ae60");
                         }
                     });
 
-                    // Define status como BLOQUEADO/UTILIZADO no cache para evitar re-verificação
+                    // Define status como BLOQUEADO no cache
                     const statusBloqueado = {
                         text: "🚫 " + primeiroNome + " - JÁ UTILIZOU",
                         borderColor: "#c62828",

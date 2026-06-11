@@ -329,6 +329,19 @@
     <button id="btn-salvar-urls" class="btn-primary" style="width: 100%;">Salvar Planilhas</button>
   </div>
 
+  <!-- SEÇÃO DE BACKUP E SEGURANÇA -->
+  <div class="section-title">💾 Backup e Segurança</div>
+  <div class="card">
+    <div style="display: flex; gap: 10px;">
+      <button id="btn-export-backup" class="btn-primary" style="flex: 1; background: var(--boti-accent);">Exportar</button>
+      <button id="btn-import-backup" class="btn-primary" style="flex: 1; background: var(--boti-primary-light);">Importar</button>
+    </div>
+    <input type="file" id="file-import" style="display: none;" accept=".json">
+    <p style="font-size: 10px; color: var(--boti-text-muted); margin-top: 8px; text-align: center;">
+      O backup inclui todas as URLs, supervisores, usuários e configurações.
+    </p>
+  </div>
+
   <!-- SEÇÃO DE URLS DE ATIVAÇÃO -->
   <div class="section-title">🌐 URLs de Ativação do Painel</div>
   <div class="card">
