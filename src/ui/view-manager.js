@@ -171,6 +171,30 @@ window.SGI.ui = {
         </div>
     `;
         document.body.appendChild(flutuanteCombo);
+
+        // Novo Modal de Confirmação de Leitura (Preços e Proves)
+        const modalConfirmacao = document.createElement('div');
+        modalConfirmacao.id = 'vd-modal-confirmacao';
+        modalConfirmacao.style.cssText = `
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
+            width: 320px; background: #fff; border-radius: 12px; padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4); z-index: 30000;
+            display: none; flex-direction: column; align-items: center; text-align: center;
+            font-family: 'Segoe UI', Arial, sans-serif; transition: all 0.2s ease;
+            border: 2px solid #1a47d4;
+        `;
+        modalConfirmacao.innerHTML = `
+            <div style="font-size: 14px; color: #555; margin-bottom: 5px; font-weight: bold; text-transform: uppercase;">Confirmar Produto?</div>
+            <div id="vd-confirm-nome" style="font-size: 18px; font-weight: bold; color: #1a47d4; margin-bottom: 10px; line-height: 1.2;">NOME DO PRODUTO</div>
+            <div id="vd-confirm-codigo" style="font-size: 14px; color: #777; margin-bottom: 20px; background: #f0f4ff; padding: 4px 10px; border-radius: 4px;">Código: 00000</div>
+            
+            <div style="display: flex; gap: 10px; width: 100%;">
+                <button id="vd-confirm-sim" style="flex: 1; padding: 12px; border: none; background: #27ae60; color: #fff; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;">SIM</button>
+                <button id="vd-confirm-nao" style="flex: 1; padding: 12px; border: none; background: #ef4444; color: #fff; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;">NÃO</button>
+            </div>
+            <div style="margin-top: 15px; font-size: 11px; color: #999;">Aguardando confirmação...</div>
+        `;
+        document.body.appendChild(modalConfirmacao);
     },
 
     aplicarConfiguracoesVisuais: function() {
