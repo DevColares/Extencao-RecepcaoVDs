@@ -29,7 +29,9 @@ function inicializarExtensao() {
     const url = window.location.href.toLowerCase();
     const isPaginaAtiva = url.includes("/paginas/gestaorede/") || 
                           url.includes("realizarpedidopdv.aspx") || 
-                          url.includes("pagamento");
+                          url.includes("pagamento") ||
+                          url.includes("faturamento") ||
+                          url.includes("venda");
 
     // Só cria o painel no DOM se for uma página onde ele deve aparecer para evitar flicker no menu
     if (isPaginaAtiva) {
@@ -126,18 +128,22 @@ function inicializarExtensao() {
     const verificarSaidaPDV = () => {
         const url = window.location.href.toLowerCase();
         
-        // No PDV real (Pedido ou Pagamento)
-        const isNoPDVAtivo = url.includes("realizarpedidopdv.aspx") || url.includes("pagamento");
+        // No PDV real (Pedido, Pagamento, Faturamento ou qualquer página do GestaoRede)
+        const isNoPDVAtivo = url.includes("realizarpedidopdv.aspx") || 
+                             url.includes("pagamento") || 
+                             url.includes("/paginas/gestaorede/") ||
+                             url.includes("faturamento") ||
+                             url.includes("venda");
         
         // Telas de conclusão/pós-venda que indicam que o atendimento acabou
         const isConcluido = url.includes("impressao") || url.includes("concluido") || url.includes("finalizado") || url.includes("sucesso");
         
+        console.log("[SGI EXT] verificarSaidaPDV | URL:", url, "| isNoPDVAtivo:", isNoPDVAtivo, "| isConcluido:", isConcluido);
+        
         // Se não estamos no PDV ativo OU se já chegamos na tela de conclusão, limpamos a memória
         if (!isNoPDVAtivo || isConcluido) {
             if (sessionStorage.getItem("vd_em_andamento") === "true" || sessionStorage.getItem("vd_cache_status")) {
-                // Se for conclusão, só limpamos se NÃO houver algo em andamento (ou limpamos tudo de vez)
-                // Para garantir que "volte e checa novamente", limpamos tudo.
-                console.log("Fluxo de PDV encerrado ou Saída detectada. Limpando estados.");
+                console.log("[SGI EXT] Fluxo de PDV encerrado ou Saída detectada. Limpando estados da sessão.");
                 sessionStorage.removeItem("vd_em_andamento");
                 sessionStorage.removeItem("vd_usuario_ativo");
                 sessionStorage.removeItem("vd_nome_cliente");
@@ -168,7 +174,11 @@ function inicializarExtensao() {
             // Se estamos no PDV, mantemos o último status verificado no badge via cache da sessão
             // Caso contrário, resetamos tudo.
             const url = window.location.href.toLowerCase();
-            const isPDV = url.includes("realizarpedidopdv.aspx") || url.includes("pagamento");
+            const isPDV = url.includes("realizarpedidopdv.aspx") || 
+                          url.includes("pagamento") || 
+                          url.includes("/paginas/gestaorede/") ||
+                          url.includes("faturamento") ||
+                          url.includes("venda");
             
             if (!isPDV) {
                 st.ultimoNomeConsultado = "";
@@ -236,7 +246,11 @@ function inicializarExtensao() {
         
         // Restaura badge do cache IMEDIATAMENTE se estivermos no PDV
         const url = window.location.href.toLowerCase();
-        const isPDV = url.includes("realizarpedidopdv.aspx") || url.includes("pagamento");
+        const isPDV = url.includes("realizarpedidopdv.aspx") || 
+                      url.includes("pagamento") || 
+                      url.includes("/paginas/gestaorede/") ||
+                      url.includes("faturamento") ||
+                      url.includes("venda");
         if (isPDV && st.configModoPrincipal === "caixa") {
             window.SGI.caixa.verificarReciclaCaixa("", "");
         }
@@ -260,7 +274,9 @@ function inicializarExtensao() {
     window.SGI.combos.iniciarListeners();
     window.SGI.caixa.iniciarMonitorDeBrindes();
 
+    console.log("[SGI EXT] Verificando lançamento pendente na inicialização. vd_em_andamento:", sessionStorage.getItem("vd_em_andamento"));
     if (sessionStorage.getItem("vd_em_andamento") === "true") {
+        console.log("[SGI EXT] Lançamento em andamento ativo. Chamando iniciarVerificacaoFinal.");
         window.SGI.caixa.iniciarVerificacaoFinal();
     }
 

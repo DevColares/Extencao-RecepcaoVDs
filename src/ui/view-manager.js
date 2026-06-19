@@ -204,7 +204,9 @@ window.SGI.ui = {
         // Verifica se estamos em uma página que deve mostrar o painel
         const isPaginaAtiva = url.includes("/paginas/gestaorede/") || 
                               url.includes("realizarpedidopdv.aspx") || 
-                              url.includes("pagamento");
+                              url.includes("pagamento") ||
+                              url.includes("faturamento") ||
+                              url.includes("venda");
 
         const painel = document.getElementById("painelVD");
         if (painel) {

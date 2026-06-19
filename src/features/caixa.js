@@ -385,19 +385,30 @@ window.SGI.caixa = {
     },
 
     verificarNFEmitida: function() {
+        console.log("[SGI CAIXA] Executando verificarNFEmitida...");
+        
         // 1. Busca por imagens que contêm "bullet-10-verde" no atributo ou propriedade src
         const imagens = document.getElementsByTagName("img");
+        console.log("[SGI CAIXA] Total de imagens encontradas na página:", imagens.length);
         for (let img of imagens) {
             const srcProp = img.src ? img.src.toLowerCase() : "";
             const srcAttr = img.getAttribute("src") ? img.getAttribute("src").toLowerCase() : "";
             
             if (srcProp.includes("bullet-10-verde") || srcAttr.includes("bullet-10-verde")) {
-                // Verifica dimensões físicas e visibilidade no DOM
                 const rect = img.getBoundingClientRect();
                 const temDimensoes = rect.width > 0 || rect.height > 0 || img.offsetWidth > 0 || img.offsetHeight > 0;
                 const naoOcultoEstilo = img.style.display !== "none" && img.style.visibility !== "hidden";
+                const temOffsetParent = img.offsetParent !== null;
                 
-                if ((temDimensoes && naoOcultoEstilo) || img.offsetParent !== null) {
+                console.log("[SGI CAIXA] Encontrou imagem candidata por TagName img.", 
+                            "srcProp:", srcProp, 
+                            "srcAttr:", srcAttr, 
+                            "temDimensoes:", temDimensoes, 
+                            "naoOcultoEstilo:", naoOcultoEstilo, 
+                            "temOffsetParent:", temOffsetParent);
+                
+                if ((temDimensoes && naoOcultoEstilo) || temOffsetParent) {
+                    console.log("[SGI CAIXA] Imagem válida detectada!");
                     return true;
                 }
             }
@@ -405,6 +416,7 @@ window.SGI.caixa = {
 
         // 2. Busca secundária robusta por classes/seletores que possam conter o bullet verde
         const seletoresExtra = document.querySelectorAll("img[src*='verde'], .bullet-verde, .nf-emitida-icon");
+        console.log("[SGI CAIXA] Total de seletores extras encontrados:", seletoresExtra.length);
         for (let el of seletoresExtra) {
             const srcProp = el.src ? el.src.toLowerCase() : "";
             const srcAttr = el.getAttribute ? (el.getAttribute("src") ? el.getAttribute("src").toLowerCase() : "") : "";
@@ -413,8 +425,17 @@ window.SGI.caixa = {
                 const rect = el.getBoundingClientRect();
                 const temDimensoes = rect.width > 0 || rect.height > 0 || el.offsetWidth > 0 || el.offsetHeight > 0;
                 const naoOcultoEstilo = el.style.display !== "none" && el.style.visibility !== "hidden";
+                const temOffsetParent = el.offsetParent !== null;
                 
-                if ((temDimensoes && naoOcultoEstilo) || el.offsetParent !== null) {
+                console.log("[SGI CAIXA] Encontrou imagem candidata por Seletor extra.", 
+                            "srcProp:", srcProp, 
+                            "srcAttr:", srcAttr, 
+                            "temDimensoes:", temDimensoes, 
+                            "naoOcultoEstilo:", naoOcultoEstilo, 
+                            "temOffsetParent:", temOffsetParent);
+                
+                if ((temDimensoes && naoOcultoEstilo) || temOffsetParent) {
+                    console.log("[SGI CAIXA] Imagem extra válida detectada!");
                     return true;
                 }
             }
@@ -422,26 +443,33 @@ window.SGI.caixa = {
 
         // 3. Verificação de fallback baseada no texto visível na página
         if (document.body && document.body.innerText.includes("NF Emitida")) {
+            console.log("[SGI CAIXA] Texto 'NF Emitida' encontrado na página (Fallback text)!");
             return true;
         }
 
+        console.log("[SGI CAIXA] Nenhuma imagem de NF Emitida ou texto 'NF Emitida' encontrados/válidos.");
         return false;
     },
 
     iniciarVerificacaoFinal: function() {
         const st = window.SGI.state;
         const urlRecicla = window.SGI.helpers.getUrlRecicla();
+        console.log("[SGI CAIXA] Iniciando iniciarVerificacaoFinal. urlRecicla:", urlRecicla);
         if (!urlRecicla) {
+            console.warn("[SGI CAIXA] URL do script recicla não configurada!");
             window.SGI.helpers.vdStatus("⚠️ URL não configurada!", "#ef4444");
             return;
         }
 
         if (window.SGI.caixa._finalCheckInterval) {
+            console.log("[SGI CAIXA] Limpando intervalo existente...");
             clearInterval(window.SGI.caixa._finalCheckInterval);
         }
 
         let tentativasCupom = 0;
         const MAX_TENTATIVAS = 20; // Aumentado para 20s
+
+        console.log("[SGI CAIXA] Definindo intervalo finalCheckInterval (1s) para monitorar emissão.");
 
         window.SGI.caixa._finalCheckInterval = setInterval(() => {
             const nomeCliente = sessionStorage.getItem("vd_nome_cliente") || "CLIENTE";
@@ -452,7 +480,10 @@ window.SGI.caixa = {
                                 document.body.innerText.includes("BOTIRECICLA") ||
                                 document.body.innerText.includes("CUPOM APLICADO");
             
+            console.log("[SGI CAIXA] Monitor - Cupom na tela:", cupomNaTela, "| tentativasCupom:", tentativasCupom, "| Detectado antes:", sessionStorage.getItem("vd_cupom_detectado"));
+            
             if (cupomNaTela && !sessionStorage.getItem("vd_cupom_detectado")) {
+                console.log("[SGI CAIXA] Cupom detectado com sucesso!");
                 sessionStorage.setItem("vd_cupom_detectado", "true");
                 window.SGI.helpers.vdStatus("✅ Cupom detectado!", "#27ae60");
             }
@@ -462,14 +493,14 @@ window.SGI.caixa = {
             }
 
             // PASSO B & C: Tela de Pagamento e NF Emitida (bullet-10-verde.gif)
-            // Removemos a trava rígida de isPaginaPagamento para ser mais flexível caso a URL mude no final
             const nfEmitida = window.SGI.caixa.verificarNFEmitida();
             const cupomDetectado = sessionStorage.getItem("vd_cupom_detectado") === "true";
 
+            console.log("[SGI CAIXA] Monitor - nfEmitida:", nfEmitida, "| cupomDetectado:", cupomDetectado);
+
             if (nfEmitida) {
-                // Se a NF saiu, mas o script perdeu o momento do cupom (timeout), 
-                // consideramos como sucesso se estivermos no PDV para não perder o registro.
                 if (cupomDetectado || tentativasCupom >= MAX_TENTATIVAS) {
+                    console.log("[SGI CAIXA] Confirmado faturamento! Interrompendo intervalo e disparando registro.");
                     
                     clearInterval(window.SGI.caixa._finalCheckInterval);
                     window.SGI.caixa._finalCheckInterval = null;
@@ -493,11 +524,14 @@ window.SGI.caixa = {
                         nf_confirmada: true
                     };
 
+                    console.log("[SGI CAIXA] Enviando POST de registro com dados:", dadosRecicla);
+
                     window.SGI.api.fetchData(urlRecicla, {
                         method: "POST",
                         headers: { "Content-Type": "text/plain" },
                         body: JSON.stringify(dadosRecicla)
                     }, function(response) {
+                        console.log("[SGI CAIXA] Resposta do script recicla:", response);
                         if (response && response.success) {
                             window.SGI.helpers.vdStatus("Baixa registrada com sucesso!", "#27ae60");
                         }
@@ -513,12 +547,15 @@ window.SGI.caixa = {
                     sessionStorage.setItem("vd_cache_status", JSON.stringify(statusBloqueado));
 
                     // Limpeza
+                    console.log("[SGI CAIXA] Removendo variáveis temporárias de sessão do caixa.");
                     sessionStorage.removeItem("vd_em_andamento");
                     sessionStorage.removeItem("vd_usuario_ativo");
                     sessionStorage.removeItem("vd_nome_cliente");
                     sessionStorage.removeItem("vd_codigo_cliente");
                     sessionStorage.removeItem("vd_cupom_detectado");
                     sessionStorage.removeItem("vd_cupom");
+                } else {
+                    console.log("[SGI CAIXA] NF Emitida, mas cupom não foi detectado e ainda não estourou tentativasCupom:", tentativasCupom, "/", MAX_TENTATIVAS);
                 }
             }
         }, 1000);
