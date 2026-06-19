@@ -443,7 +443,17 @@ window.SGI.caixa = {
         console.log("[SGI CAIXA] Iniciando iniciarVerificacaoFinal. urlRecicla:", urlRecicla);
         if (!urlRecicla) {
             console.warn("[SGI CAIXA] URL do script recicla não configurada!");
-            window.SGI.helpers.vdStatus("⚠️ URL não configurada!", "#ef4444");
+            
+            // Exibir aviso no badge principal do caixa
+            const badge = document.getElementById("vd-badge-boti-caixa");
+            if (badge) {
+                badge.innerText = "⚠️ CONFIGURAR POPUP";
+                badge.style.borderColor = "#ef4444";
+                badge.style.color = "#ef4444";
+                badge.style.background = "#fff5f5";
+            }
+            
+            window.SGI.helpers.vdStatus("⚠️ URL não configurada! Acesse o popup da extensão.", "#ef4444");
             return;
         }
 
