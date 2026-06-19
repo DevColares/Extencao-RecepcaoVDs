@@ -229,16 +229,6 @@ window.SGI.combos = {
                     setTimeout(() => {
                         window.SGI.combos.abrirModalCombo(combosEncontrados, input, codLidoOriginal);
                     }, 300);
-                } else if (isTelaConfirmacao && codLidoOriginal.length >= 5) {
-                    // Se for uma tela de Preços/Proves/Pedido e não for combo, mostra confirmação simples
-                    window.SGI.combos.bloqueandoEnterOriginal = true;
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                    input.value = '';
-                    // Pequeno delay para "leitura" do código
-                    setTimeout(() => {
-                        window.SGI.combos.mostrarModalConfirmacao(input, codLidoOriginal, nomeProdutoIdentificado);
-                    }, 300);
                 } else {
                     const flutuanteCombo = document.getElementById('alerta-combo-flutuante');
                     if (flutuanteCombo) flutuanteCombo.classList.remove('show');

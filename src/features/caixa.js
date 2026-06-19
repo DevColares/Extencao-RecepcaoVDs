@@ -385,21 +385,43 @@ window.SGI.caixa = {
     },
 
     verificarNFEmitida: function() {
-        // Busca em todas as imagens da página de forma exaustiva
+        // 1. Busca por imagens que contêm "bullet-10-verde" no atributo ou propriedade src
         const imagens = document.getElementsByTagName("img");
         for (let img of imagens) {
-            const src = img.src.toLowerCase();
-            if (src.includes("bullet-10-verde.gif")) {
-                // Verifica se a imagem está realmente visível na tela
-                if (img.offsetParent !== null && img.style.display !== "none" && img.style.visibility !== "hidden") {
+            const srcProp = img.src ? img.src.toLowerCase() : "";
+            const srcAttr = img.getAttribute("src") ? img.getAttribute("src").toLowerCase() : "";
+            
+            if (srcProp.includes("bullet-10-verde") || srcAttr.includes("bullet-10-verde")) {
+                // Verifica dimensões físicas e visibilidade no DOM
+                const rect = img.getBoundingClientRect();
+                const temDimensoes = rect.width > 0 || rect.height > 0 || img.offsetWidth > 0 || img.offsetHeight > 0;
+                const naoOcultoEstilo = img.style.display !== "none" && img.style.visibility !== "hidden";
+                
+                if ((temDimensoes && naoOcultoEstilo) || img.offsetParent !== null) {
                     return true;
                 }
             }
         }
 
-        // Busca secundária por classes ou atributos que o SGI costuma usar para esse bullet
-        const seletorExtra = document.querySelector("img[src*='verde'], .bullet-verde, .nf-emitida-icon");
-        if (seletorExtra && seletorExtra.src.toLowerCase().includes("bullet-10-verde")) {
+        // 2. Busca secundária robusta por classes/seletores que possam conter o bullet verde
+        const seletoresExtra = document.querySelectorAll("img[src*='verde'], .bullet-verde, .nf-emitida-icon");
+        for (let el of seletoresExtra) {
+            const srcProp = el.src ? el.src.toLowerCase() : "";
+            const srcAttr = el.getAttribute ? (el.getAttribute("src") ? el.getAttribute("src").toLowerCase() : "") : "";
+            
+            if (srcProp.includes("bullet-10-verde") || srcAttr.includes("bullet-10-verde")) {
+                const rect = el.getBoundingClientRect();
+                const temDimensoes = rect.width > 0 || rect.height > 0 || el.offsetWidth > 0 || el.offsetHeight > 0;
+                const naoOcultoEstilo = el.style.display !== "none" && el.style.visibility !== "hidden";
+                
+                if ((temDimensoes && naoOcultoEstilo) || el.offsetParent !== null) {
+                    return true;
+                }
+            }
+        }
+
+        // 3. Verificação de fallback baseada no texto visível na página
+        if (document.body && document.body.innerText.includes("NF Emitida")) {
             return true;
         }
 
