@@ -86,6 +86,50 @@ window.SGI.combos = {
         }, 100);
     },
 
+    mostrarModalConfirmacao: function(input, codigo, nome) {
+        const modal = document.getElementById('vd-modal-confirmacao');
+        const txtNome = document.getElementById('vd-confirm-nome');
+        const txtCodigo = document.getElementById('vd-confirm-codigo');
+        const btnSim = document.getElementById('vd-confirm-sim');
+        const btnNao = document.getElementById('vd-confirm-nao');
+
+        if (!modal || !txtNome || !txtCodigo || !btnSim || !btnNao) return;
+
+        txtNome.innerText = nome || "PRODUTO NÃO IDENTIFICADO";
+        txtCodigo.innerText = "Código: " + codigo;
+        modal.style.display = "flex";
+        modal.style.transform = "translate(-50%, -50%) scale(1)";
+
+        const fechar = () => {
+            modal.style.display = "none";
+            modal.style.transform = "translate(-50%, -50%) scale(0.9)";
+            window.SGI.combos.bloqueandoEnterOriginal = false;
+        };
+
+        btnSim.onclick = () => {
+            fechar();
+            // Delay solicitado pelo usuário antes de lançar
+            setTimeout(() => {
+                window.SGI.combos.darPlayNoFluxo(input, codigo);
+            }, 500);
+        };
+
+        btnNao.onclick = () => {
+            fechar();
+            input.value = "";
+            input.focus();
+        };
+
+        // Atalhos de teclado no modal
+        const handleKeys = (e) => {
+            if (modal.style.display === "flex") {
+                if (e.key === "Enter") { e.preventDefault(); btnSim.click(); window.removeEventListener('keydown', handleKeys); }
+                if (e.key === "Escape") { e.preventDefault(); btnNao.click(); window.removeEventListener('keydown', handleKeys); }
+            }
+        };
+        window.addEventListener('keydown', handleKeys);
+    },
+
     abrirModalCombo: function(dadosArray, inputOriginal, codIndividualOriginal) {
         const listaCombo = document.getElementById('combo-lista');
         if (!listaCombo) return;
@@ -157,13 +201,21 @@ window.SGI.combos = {
                     codLidoBusca = codLidoOriginal.substring(7, 12); 
                 }
 
+                const url = window.location.href.toLowerCase();
+                // Identifica se estamos em telas de Preços, Provadores ou se é uma busca de produto genérica
+                const isTelaConfirmacao = url.includes("consultapreco") || url.includes("provador") || url.includes("estoque") || url.includes("pedido");
+
                 let combosEncontrados = [];
+                let nomeProdutoIdentificado = "";
+
                 for (let chaveBanco in window.SGI.combos.bancoDeCombos) {
+                    let item = window.SGI.combos.bancoDeCombos[chaveBanco];
                     let codigosIndividuais = chaveBanco.split(/[,/;\s-]+/).map(c => c.trim()).filter(c => c.length > 0);
                     
                     if (codigosIndividuais.includes(codLidoBusca)) {
-                        if (codLidoBusca !== window.SGI.combos.bancoDeCombos[chaveBanco].codigoCombo && codLidoOriginal !== window.SGI.combos.bancoDeCombos[chaveBanco].codigoCombo) {
-                            combosEncontrados.push(window.SGI.combos.bancoDeCombos[chaveBanco]);
+                        nomeProdutoIdentificado = item.nome; // Guarda o nome do produto/combo
+                        if (codLidoBusca !== item.codigoCombo && codLidoOriginal !== item.codigoCombo) {
+                            combosEncontrados.push(item);
                         }
                     }
                 }
@@ -172,10 +224,21 @@ window.SGI.combos = {
                     window.SGI.combos.bloqueandoEnterOriginal = true; 
                     e.preventDefault();
                     e.stopImmediatePropagation();
-                    
                     input.value = ''; 
-                    
-                    window.SGI.combos.abrirModalCombo(combosEncontrados, input, codLidoOriginal);
+                    // Pequeno delay para "leitura" do código
+                    setTimeout(() => {
+                        window.SGI.combos.abrirModalCombo(combosEncontrados, input, codLidoOriginal);
+                    }, 300);
+                } else if (isTelaConfirmacao && codLidoOriginal.length >= 5) {
+                    // Se for uma tela de Preços/Proves/Pedido e não for combo, mostra confirmação simples
+                    window.SGI.combos.bloqueandoEnterOriginal = true;
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    input.value = '';
+                    // Pequeno delay para "leitura" do código
+                    setTimeout(() => {
+                        window.SGI.combos.mostrarModalConfirmacao(input, codLidoOriginal, nomeProdutoIdentificado);
+                    }, 300);
                 } else {
                     const flutuanteCombo = document.getElementById('alerta-combo-flutuante');
                     if (flutuanteCombo) flutuanteCombo.classList.remove('show');
