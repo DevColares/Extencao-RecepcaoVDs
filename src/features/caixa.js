@@ -4,7 +4,7 @@ window.SGI.caixa = {
     carregarSelectCaixas: function() {
         const select = document.getElementById("vd-select-caixa");
         if (!select) return;
-        const atual = select.value;
+        const atual = select.value || window.SGI.state.configCaixaAtivo || "";
         select.innerHTML = '<option value="">-- Selecione --</option>';
         window.SGI.state.configUsuariosCaixa.forEach(u => {
             const opt = document.createElement("option");
@@ -137,6 +137,15 @@ window.SGI.caixa = {
                 badge.style.borderColor = cache.borderColor;
                 badge.style.color = cache.color;
                 badge.style.background = cache.background;
+                
+                // Restaura o estado do botão de lançar do cache
+                const btnLancar = document.getElementById("vd-btn-lancar-caixa");
+                if (btnLancar) {
+                    const bloqueado = cache.text.includes("NÃO TEM") || cache.text.includes("UTILIZOU") || cache.text.includes("ERRO");
+                    btnLancar.disabled = bloqueado;
+                    btnLancar.style.opacity = bloqueado ? "0.5" : "1";
+                    btnLancar.style.pointerEvents = bloqueado ? "none" : "auto";
+                }
                 return;
             }
 
@@ -443,7 +452,7 @@ window.SGI.caixa = {
                     clearInterval(window.SGI.caixa._finalCheckInterval);
                     window.SGI.caixa._finalCheckInterval = null;
                     
-                    const operador = sessionStorage.getItem("vd_usuario_ativo") || "SGI";
+                    const operador = sessionStorage.getItem("vd_usuario_ativo") || window.SGI.state.configCaixaAtivo || "SGI";
                     const badge = document.getElementById("vd-badge-boti-caixa");
                     
                     if (badge) {

@@ -16,12 +16,14 @@ window.SGI.api = {
             "vd_escala",
             "vd_supervisores",
             "vd_usuarios",
+            "vd_recepcao_ativo",
             "vd_url_recicla",
             "vd_url_retirada",
             "vd_url_combos",
             "vd_modo_principal",
             "vd_usuarios_caixa",
             "vd_cupom_caixa",
+            "vd_caixa_ativo",
             "vd_cfg_supervisor_ativo",
             "vd_cfg_retirada_ativo",
             "vd_cfg_recicla_ativo",
@@ -32,11 +34,13 @@ window.SGI.api = {
             st.configScale = data.vd_escala || "1";
             st.configSupervisores = data.vd_supervisores || {};
             st.configUsuarios = data.vd_usuarios || [];
+            st.configRecepcaoAtivo = data.vd_recepcao_ativo || "";
             st.configUrlRecicla = data.vd_url_recicla || "";
             st.configUrlRetirada = data.vd_url_retirada || "";
             st.configUrlCombos = data.vd_url_combos || "";
             st.configUsuariosCaixa = data.vd_usuarios_caixa || [];
             st.configCupomCaixa = data.vd_cupom_caixa || "";
+            st.configCaixaAtivo = data.vd_caixa_ativo || "";
             st.configModoPrincipal = data.vd_modo_principal || "recepcao";
             
             st.configSupervisorAtivo = data.vd_cfg_supervisor_ativo !== false;

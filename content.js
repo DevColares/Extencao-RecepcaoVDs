@@ -67,6 +67,22 @@ function inicializarExtensao() {
         });
     });
     
+    if(getEl("vd-select-caixa")) getEl("vd-select-caixa").addEventListener("change", (e) => {
+        const st = window.SGI.state;
+        st.configCaixaAtivo = e.target.value;
+        window.SGI.api.salvarStorage("vd_caixa_ativo", st.configCaixaAtivo, () => {
+            window.SGI.helpers.vdStatus("Caixa ativo atualizado!", "#27ae60");
+        });
+    });
+
+    if(getEl("vd-select")) getEl("vd-select").addEventListener("change", (e) => {
+        const st = window.SGI.state;
+        st.configRecepcaoAtivo = e.target.value;
+        window.SGI.api.salvarStorage("vd_recepcao_ativo", st.configRecepcaoAtivo, () => {
+            window.SGI.helpers.vdStatus("Usuário ativo atualizado!", "#27ae60");
+        });
+    });
+    
     if(getEl("vd-enviar-pill")) getEl("vd-enviar-pill").addEventListener("click", window.SGI.recepcao.vdEnviar);
     if(getEl("btn-whatsapp")) getEl("btn-whatsapp").addEventListener("click", window.SGI.recepcao.abrirWhatsApp);
     if(getEl("btn-retirada")) getEl("btn-retirada").addEventListener("click", () => window.SGI.recepcao.verificarRetirada(false));

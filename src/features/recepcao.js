@@ -4,7 +4,7 @@ window.SGI.recepcao = {
     carregarSelectUsuarios: function() {
         const select = document.getElementById("vd-select");
         if (!select) return;
-        const atual = select.value;
+        const atual = select.value || window.SGI.state.configRecepcaoAtivo || "";
         select.innerHTML = '<option value="">-- Selecione --</option>';
         window.SGI.state.configUsuarios.forEach(u => {
             const opt = document.createElement("option");
