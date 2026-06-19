@@ -281,10 +281,18 @@ window.SGI.ui = {
         if (!("Notification" in window)) return;
 
         const disparar = () => {
-            new Notification("♻️ Boti Recicla Encontrado!", {
+            const notificacao = new Notification("♻️ Boti Recicla Encontrado!", {
                 body: `Atenção: ${primeiroNome} TEM BOTI RECICLA disponível!`,
                 icon: "https://www.boticario.com.br/favicon.ico"
             });
+
+            notificacao.onclick = function() {
+                window.focus();
+                const btnLancar = document.getElementById("vd-btn-lancar-caixa");
+                if (btnLancar) {
+                    btnLancar.click();
+                }
+            };
         };
 
         if (Notification.permission === "granted") {
