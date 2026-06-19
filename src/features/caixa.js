@@ -387,7 +387,20 @@ window.SGI.caixa = {
     verificarNFEmitida: function() {
         console.log("[SGI CAIXA] Executando verificarNFEmitida...");
         
-        // 1. Busca por imagens que contêm "bullet-10-verde" no atributo ou propriedade src
+        // 1. Estratégia precisa do UserScript: busca em células td da tabela com a classe td-pedido
+        const tdsPedido = document.querySelectorAll("td.td-pedido");
+        console.log("[SGI CAIXA] Total de células td.td-pedido encontradas:", tdsPedido.length);
+        for (let td of tdsPedido) {
+            if (td.innerText.includes("NF Emitida")) {
+                const img = td.querySelector("img[src*='bullet-10-verde']");
+                if (img) {
+                    console.log("[SGI CAIXA] Sucesso! Encontrou o bullet verde em uma célula td.td-pedido contendo 'NF Emitida'.");
+                    return true;
+                }
+            }
+        }
+
+        // 2. Busca genérica em todas as imagens (Estratégia secundária da extensão)
         const imagens = document.getElementsByTagName("img");
         console.log("[SGI CAIXA] Total de imagens encontradas na página:", imagens.length);
         for (let img of imagens) {
@@ -408,42 +421,15 @@ window.SGI.caixa = {
                             "temOffsetParent:", temOffsetParent);
                 
                 if ((temDimensoes && naoOcultoEstilo) || temOffsetParent) {
-                    console.log("[SGI CAIXA] Imagem válida detectada!");
+                    console.log("[SGI CAIXA] Sucesso! Bullet verde genérico válido detectado.");
                     return true;
                 }
             }
         }
 
-        // 2. Busca secundária robusta por classes/seletores que possam conter o bullet verde
-        const seletoresExtra = document.querySelectorAll("img[src*='verde'], .bullet-verde, .nf-emitida-icon");
-        console.log("[SGI CAIXA] Total de seletores extras encontrados:", seletoresExtra.length);
-        for (let el of seletoresExtra) {
-            const srcProp = el.src ? el.src.toLowerCase() : "";
-            const srcAttr = el.getAttribute ? (el.getAttribute("src") ? el.getAttribute("src").toLowerCase() : "") : "";
-            
-            if (srcProp.includes("bullet-10-verde") || srcAttr.includes("bullet-10-verde")) {
-                const rect = el.getBoundingClientRect();
-                const temDimensoes = rect.width > 0 || rect.height > 0 || el.offsetWidth > 0 || el.offsetHeight > 0;
-                const naoOcultoEstilo = el.style.display !== "none" && el.style.visibility !== "hidden";
-                const temOffsetParent = el.offsetParent !== null;
-                
-                console.log("[SGI CAIXA] Encontrou imagem candidata por Seletor extra.", 
-                            "srcProp:", srcProp, 
-                            "srcAttr:", srcAttr, 
-                            "temDimensoes:", temDimensoes, 
-                            "naoOcultoEstilo:", naoOcultoEstilo, 
-                            "temOffsetParent:", temOffsetParent);
-                
-                if ((temDimensoes && naoOcultoEstilo) || temOffsetParent) {
-                    console.log("[SGI CAIXA] Imagem extra válida detectada!");
-                    return true;
-                }
-            }
-        }
-
-        // 3. Verificação de fallback baseada no texto visível na página
+        // 3. Fallback: Verificação direta por texto
         if (document.body && document.body.innerText.includes("NF Emitida")) {
-            console.log("[SGI CAIXA] Texto 'NF Emitida' encontrado na página (Fallback text)!");
+            console.log("[SGI CAIXA] Sucesso! Texto 'NF Emitida' encontrado na página (Fallback text).");
             return true;
         }
 

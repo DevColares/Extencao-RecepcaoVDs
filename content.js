@@ -1,6 +1,8 @@
+console.log("[SGI DEBUG] Script content.js iniciado. URL:", window.location.href);
 const urlAtual = window.location.href.toLowerCase();
 // Agora o script roda em todo o domínio SGI para gerenciar a limpeza de memória
 const isDominioSGI = urlAtual.includes("sgi.e-boticario.com.br");
+console.log("[SGI DEBUG] Domínio SGI detectado:", isDominioSGI);
 
 if (isDominioSGI) {
     if (document.readyState === "loading") {
