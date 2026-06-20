@@ -427,13 +427,16 @@ window.SGI.caixa = {
             }
         }
 
-        // 3. Fallback: Verificação direta por texto
-        if (document.body && document.body.innerText.includes("NF Emitida")) {
-            console.log("[SGI CAIXA] Sucesso! Texto 'NF Emitida' encontrado na página (Fallback text).");
-            return true;
+        // 3. Fallback: Verificação de texto 'NF Emitida' associada ao bullet verde na célula td
+        const tdsFallback = document.querySelectorAll("td");
+        for (let td of tdsFallback) {
+            if (td.innerText.includes("NF Emitida") && td.querySelector("img[src*='bullet-10-verde']")) {
+                console.log("[SGI CAIXA] Sucesso! Texto 'NF Emitida' com bullet verde encontrado em célula td (Fallback).");
+                return true;
+            }
         }
 
-        console.log("[SGI CAIXA] Nenhuma imagem de NF Emitida ou texto 'NF Emitida' encontrados/válidos.");
+        console.log("[SGI CAIXA] Nenhuma imagem de NF Emitida ou texto 'NF Emitida' com bullet verde encontrados/válidos.");
         return false;
     },
 
@@ -468,6 +471,13 @@ window.SGI.caixa = {
         console.log("[SGI CAIXA] Definindo intervalo finalCheckInterval (1s) para monitorar emissão.");
 
         window.SGI.caixa._finalCheckInterval = setInterval(() => {
+            if (sessionStorage.getItem("vd_em_andamento") !== "true") {
+                console.log("[SGI CAIXA] Lançamento não está mais em andamento. Limpando finalCheckInterval.");
+                clearInterval(window.SGI.caixa._finalCheckInterval);
+                window.SGI.caixa._finalCheckInterval = null;
+                return;
+            }
+
             const nomeCliente = sessionStorage.getItem("vd_nome_cliente") || "CLIENTE";
             const primeiroNome = nomeCliente.split(" ")[0];
 
