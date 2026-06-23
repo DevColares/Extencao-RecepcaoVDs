@@ -549,7 +549,6 @@ window.SGI.caixa = {
                         headers: { "Content-Type": "text/plain" },
                         body: JSON.stringify({
                             usuario: usuarioMemoria,
-                            nome: nomeRevendedor,
                             codigo: codigoRevendedor,
                             origem: "caixa"
                         })
