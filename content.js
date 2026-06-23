@@ -33,7 +33,9 @@ function inicializarExtensao() {
                           url.includes("realizarpedidopdv.aspx") || 
                           url.includes("pagamento") ||
                           url.includes("faturamento") ||
-                          url.includes("venda");
+                          url.includes("venda") ||
+                          url.includes("brindespdv") ||
+                          url.includes("brinde");
 
     // Só cria o painel no DOM se for uma página onde ele deve aparecer para evitar flicker no menu
     if (isPaginaAtiva) {
@@ -130,12 +132,14 @@ function inicializarExtensao() {
     const verificarSaidaPDV = () => {
         const url = window.location.href.toLowerCase();
         
-        // No PDV real (Pedido, Pagamento, Faturamento ou qualquer página do GestaoRede)
+        // No PDV real (Pedido, Pagamento, Faturamento, Brindes ou qualquer página do GestaoRede)
         const isNoPDVAtivo = url.includes("realizarpedidopdv.aspx") || 
                              url.includes("pagamento") || 
                              url.includes("/paginas/gestaorede/") ||
                              url.includes("faturamento") ||
-                             url.includes("venda");
+                             url.includes("venda") ||
+                             url.includes("brindespdv") ||
+                             url.includes("brinde");
         
         // Telas de conclusão/pós-venda que indicam que o atendimento acabou
         const isConcluido = url.includes("impressao") || url.includes("concluido") || url.includes("finalizado") || url.includes("sucesso");
@@ -180,7 +184,9 @@ function inicializarExtensao() {
                           url.includes("pagamento") || 
                           url.includes("/paginas/gestaorede/") ||
                           url.includes("faturamento") ||
-                          url.includes("venda");
+                          url.includes("venda") ||
+                          url.includes("brindespdv") ||
+                          url.includes("brinde");
             
             if (!isPDV) {
                 st.ultimoNomeConsultado = "";
@@ -252,7 +258,9 @@ function inicializarExtensao() {
                       url.includes("pagamento") || 
                       url.includes("/paginas/gestaorede/") ||
                       url.includes("faturamento") ||
-                      url.includes("venda");
+                      url.includes("venda") ||
+                      url.includes("brindespdv") ||
+                      url.includes("brinde");
         if (isPDV && st.configModoPrincipal === "caixa") {
             window.SGI.caixa.verificarReciclaCaixa("", "");
         }

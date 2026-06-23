@@ -486,7 +486,17 @@ window.SGI.caixa = {
 
             const cupomSalvo = sessionStorage.getItem("vd_cupom_detectado") === "true";
 
+            // ⚠️ O timeout SÓ deve disparar quando estamos na página de pagamento.
+            // Se ainda estamos em outra tela do PDV (ex: EscolherBrindesPDV, realizarpedidopdv),
+            // o cliente pode estar escolhendo brindes — resetamos o contador e aguardamos.
             if (!cupomNaTela && !cupomSalvo && tentativas > 15) {
+                if (!window.SGI.caixa.isPaginaPagamento()) {
+                    // Ainda no fluxo do PDV mas não no pagamento: zera tentativas e aguarda
+                    tentativas = 0;
+                    console.log("[SGI CAIXA] Aguardando fora da página de pagamento (ex: brindes). Contador resetado.");
+                    return;
+                }
+
                 console.log("[SGI CAIXA] Tempo esgotado: cupom não detectado. Destravando painel.");
                 alert("⏱️ Tempo esgotado: cupom não detectado. Destravando painel.");
 
@@ -532,11 +542,17 @@ window.SGI.caixa = {
                 const primeiroNome = nomeRevendedor.split(" ")[0] || "REVENDEDOR";
 
                 try {
-                    // ✅ POST envia apenas o usuario (para que na planilha fique na mesma linha do revendedor, sem sobrescrever o nome)
+                    // ✅ POST envia usuario + nome/codigo + origem para que o Apps Script
+                    // saiba escrever na coluna F (LANÇADO POR), e não na E (RECEBIDO POR)
                     await fetch(urlRecicla, {
                         method: "POST", mode: "no-cors",
                         headers: { "Content-Type": "text/plain" },
-                        body: JSON.stringify({ usuario: usuarioMemoria })
+                        body: JSON.stringify({
+                            usuario: usuarioMemoria,
+                            nome: nomeRevendedor,
+                            codigo: codigoRevendedor,
+                            origem: "caixa"
+                        })
                     });
 
                     console.log("[SGI CAIXA] Dados enviados para a planilha com sucesso!");
