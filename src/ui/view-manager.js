@@ -76,12 +76,16 @@ window.SGI.ui = {
         <!-- BOTÕES DA RECEPÇÃO -->
         <div id="botoes-recepcao">
           <div id="vd-sup-display">SUPERVISOR<span id="vd-sup-nome-text">-</span></div>
-          <div class="linha-boti">
-            <button id="vd-gear" title="Configurações">⚙️</button>
-            <button id="vd-enviar-pill" class="btn-sgi">Lançar Recicla</button>
+          <div id="botoes-recepcao-hover-area">
+            <div id="botoes-recepcao-secundarios">
+              <button id="btn-whatsapp" class="btn-sgi">Solicitar Alocação</button>
+              <button id="btn-retirada" class="btn-sgi">Consultar Retirada</button>
+            </div>
+            <div class="linha-boti">
+              <button id="vd-gear" title="Configurações">⚙️</button>
+              <button id="vd-enviar-pill" class="btn-sgi">Lançar Recicla</button>
+            </div>
           </div>
-          <button id="btn-whatsapp" class="btn-sgi">Solicitar Alocação</button>
-          <button id="btn-retirada" class="btn-sgi">Consultar Retirada</button>
         </div>
 
         <!-- BOTÕES DO CAIXA -->

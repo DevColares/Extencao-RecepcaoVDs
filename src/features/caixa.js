@@ -369,8 +369,8 @@ window.SGI.caixa = {
         const badgeBtn = document.getElementById("vd-btn-lancar-caixa");
         if (badgeBtn) badgeBtn.innerText = "AGUARDANDO PAGAMENTO...";
 
-        const cod = document.getElementById("ContentPlaceHolder1_cltBuscaPessoa_codigoEntradaNumero_Tb1");
-        const nom = document.getElementById("ContentPlaceHolder1_cltBuscaPessoa_nomeEntradaTexto_Tb1");
+        const cod = document.getElementById("ContentPlaceHolder1_cltBuscaPessoa_codigoEntradaNumero_Tb1") || document.querySelector("input[id*='codigoEntradaNumero']");
+        const nom = document.getElementById("ContentPlaceHolder1_cltBuscaPessoa_nomeEntradaTexto_Tb1") || document.querySelector("input[id*='nomeEntradaTexto']");
 
         sessionStorage.setItem("vd_em_andamento", "true");
         sessionStorage.setItem("vd_usuario_ativo", usuario);
@@ -539,45 +539,91 @@ window.SGI.caixa = {
                 }
 
                 const usuarioMemoria = sessionStorage.getItem("vd_usuario_ativo") || window.SGI.state.configCaixaAtivo || "DESCONHECIDO";
-                const primeiroNome = nomeRevendedor.split(" ")[0] || "REVENDEDOR";
+
+                // Na página de pagamento o código não está disponível, mas o nome sim.
+                // Tenta ler o nome diretamente da tela de pagamento como fonte primária.
+                const campoPagamentoNome =
+                    document.getElementById("ctl00_content_textNomePessoa") ||
+                    document.querySelector("input[name='ctl00$content$textNomePessoa']") ||
+                    document.querySelector("input[id*='textNomePessoa']");
+
+                const nomeFinal = (campoPagamentoNome && campoPagamentoNome.value.trim())
+                    ? campoPagamentoNome.value.trim()
+                    : nomeRevendedor;
+
+                const primeiroNome = nomeFinal.split(" ")[0] || "REVENDEDOR";
+
+                console.log("[SGI CAIXA] Nome final para planilha:", nomeFinal, "| Usuário:", usuarioMemoria);
 
                 try {
-                    // ✅ POST envia usuario + nome/codigo + origem para que o Apps Script
-                    // saiba escrever na coluna F (LANÇADO POR), e não na E (RECEBIDO POR)
-                    await fetch(urlRecicla, {
-                        method: "POST", mode: "no-cors",
+                    // ✅ Usando API padronizada via background para evitar CORS
+                    window.SGI.api.fetchData(urlRecicla, {
+                        method: "POST",
                         headers: { "Content-Type": "text/plain" },
                         body: JSON.stringify({
                             usuario: usuarioMemoria,
+                            nome: nomeFinal,
                             codigo: codigoRevendedor,
                             origem: "caixa"
                         })
+                    }, function (response) {
+                        if (!response || !response.success) {
+                            console.error("[SGI CAIXA] Erro de rede ao enviar:", response);
+                            alert("❌ Erro de rede ao enviar para a planilha.");
+                            destravarBtn();
+                            return;
+                        }
+
+                        console.log("[SGI CAIXA] Resposta bruta do Apps Script:", response.text);
+
+                        try {
+                            const dadosResp = JSON.parse(response.text);
+                            if (dadosResp.status === "nao_encontrado") {
+                                console.error("[SGI CAIXA] Apps Script não encontrou o revendedor:", dadosResp.message);
+                                alert("⚠️ Planilha: " + dadosResp.message);
+                                destravarBtn();
+                                return;
+                            }
+                        } catch (err) {
+                            console.warn("[SGI CAIXA] Não foi possível fazer o parse da resposta:", err);
+                        }
+
+                        console.log("[SGI CAIXA] Dados salvos na planilha com sucesso!");
+
+                        sessionStorage.removeItem("vd_em_andamento");
+                        sessionStorage.removeItem("vd_cupom_detectado");
+
+                        const statusBloqueado = {
+                            text: "🚫 " + primeiroNome + " - JÁ UTILIZOU",
+                            borderColor: "#c62828",
+                            color: "#c62828",
+                            background: "#fff5f5"
+                        };
+                        sessionStorage.setItem("vd_cache_status", JSON.stringify(statusBloqueado));
+
+                        if (btn) {
+                            btn.innerHTML = "✅ SUCESSO!";
+                            btn.style.opacity = "1";
+                        }
+
+                        setTimeout(() => {
+                            if (btn) {
+                                btn.innerHTML = "Lançar";
+                            }
+                            window.SGI.caixa.verificarReciclaCaixa(nomeRevendedor, codigoRevendedor);
+                        }, 2000);
                     });
 
-                    console.log("[SGI CAIXA] Dados enviados para a planilha com sucesso!");
-
-                    sessionStorage.removeItem("vd_em_andamento");
-                    sessionStorage.removeItem("vd_cupom_detectado");
-
-                    const statusBloqueado = {
-                        text: "🚫 " + primeiroNome + " - JÁ UTILIZOU",
-                        borderColor: "#c62828",
-                        color: "#c62828",
-                        background: "#fff5f5"
-                    };
-                    sessionStorage.setItem("vd_cache_status", JSON.stringify(statusBloqueado));
-
-                    if (btn) {
-                        btn.innerHTML = "✅ SUCESSO!";
-                        btn.style.opacity = "1";
-                    }
-
-                    setTimeout(() => {
+                    function destravarBtn() {
+                        sessionStorage.removeItem("vd_em_andamento");
                         if (btn) {
                             btn.innerHTML = "Lançar";
+                            btn.disabled = false;
+                            btn.style.opacity = "1";
+                            btn.style.pointerEvents = "auto";
                         }
                         window.SGI.caixa.verificarReciclaCaixa(nomeRevendedor, codigoRevendedor);
-                    }, 2000);
+                    }
 
                 } catch (e) {
                     console.error("[SGI CAIXA] Erro no fetch:", e);

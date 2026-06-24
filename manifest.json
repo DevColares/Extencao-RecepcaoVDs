@@ -1,7 +1,8 @@
 {
   "manifest_version": 3,
   "name": "SGI Boticário - Alocação, Recicla e Supervisor",
-  "version": "9.3",
+  "version": "0.1",
+  "version_name": "0.1 Beta",
   "description": "Integração WhatsApp, Lançamento Planilha, Alerta Retirada, Mapeamento de Supervisor e Notificações no SGI Boticário.",
   "permissions": [
     "storage"
